@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusOS 9.1</title>
+    <title>NexusOS 11</title>
     <link id="favicon" rel="icon" href="https://www.google.com/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- MARKED.JS FOR MARKDOWN PARSING -->
@@ -22,9 +22,10 @@
             --accent-glow: rgba(59, 130, 246, 0.5);
             --card-bg: #111;
             
-            /* --- PHYSICS --- */
+            /* --- ENHANCED PHYSICS (Springy) --- */
+            /* Over-shoot bezier for spring effect */
             --fluid: cubic-bezier(0.2, 0.8, 0.2, 1);
-            --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6); 
             --smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -68,17 +69,37 @@
         #main-interface { opacity: 0; pointer-events: none; transition: opacity 0.8s var(--smooth); width: 100%; height: 100%; display: flex; flex-direction: column; }
         #main-interface.unlocked { opacity: 1; pointer-events: auto; }
 
-        /* --- OOBE --- */
+        /* --- PILL UI OOBE --- */
         #oobe-overlay {
             position: fixed; inset: 0; background: var(--bg-base); z-index: 10000; display: none;
-            flex-direction: column; align-items: center; justify-content: center; transition: opacity 1s var(--smooth);
+            align-items: center; justify-content: center; transition: opacity 0.5s var(--smooth);
+            backdrop-filter: blur(20px);
         }
-        .hello-word {
-            font-size: 5rem; font-weight: 800; background: linear-gradient(to right, var(--text-main), var(--text-dim));
+        
+        .pill-container {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            width: 480px;
+            max-width: 90%;
+            border-radius: 40px; /* Pill Shape */
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center;
+            transform: scale(0.9) translateY(20px); opacity: 0;
+            transition: 0.8s var(--bounce);
+        }
+        
+        #oobe-overlay.active .pill-container {
+            transform: scale(1) translateY(0); opacity: 1;
+        }
+
+        .pill-header {
+            font-size: 2rem; font-weight: 800; margin-bottom: 10px;
+            background: linear-gradient(to right, var(--text-main), var(--accent));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            opacity: 0; transform: translateY(30px) scale(0.9); transition: 1.2s var(--bounce); margin-bottom: 30px;
         }
-        .oobe-btn { opacity: 0; transform: translateY(20px); transition: 0.8s var(--fluid); }
+        
+        .pill-desc { text-align: center; color: var(--text-dim); margin-bottom: 25px; font-size: 0.9rem; }
 
         /* --- MODALS --- */
         .modal-overlay {
@@ -88,24 +109,25 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-box {
-            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 24px;
+            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 32px;
             padding: 30px; width: 500px; max-width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9) translateY(20px); transition: 0.4s var(--bounce); display: flex; flex-direction: column; max-height: 85vh;
+            transform: scale(0.8) translateY(50px); transition: 0.5s var(--bounce); 
+            display: flex; flex-direction: column; max-height: 85vh;
         }
         .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 
         /* Spoof Grid */
-        .spoof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; overflow-y: auto; padding: 5px; }
+        .spoof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; overflow-y: auto; padding: 5px; width: 100%; }
         .spoof-item {
-            background: rgba(125,125,125,0.1); border-radius: 12px; padding: 15px; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.2s; border: 1px solid transparent;
+            background: rgba(125,125,125,0.1); border-radius: 16px; padding: 12px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s var(--bounce); border: 1px solid transparent;
         }
-        .spoof-item:hover { background: rgba(125,125,125,0.2); transform: translateY(-3px); }
+        .spoof-item:hover { background: rgba(125,125,125,0.2); transform: scale(1.05); }
         .spoof-item.selected { border-color: var(--accent); background: var(--accent-glow); }
         .spoof-icon { width: 32px; height: 32px; border-radius: 6px; }
-        .spoof-name { font-size: 0.75rem; color: var(--text-dim); text-align: center; }
+        .spoof-name { font-size: 0.7rem; color: var(--text-dim); text-align: center; font-weight: 500; }
 
         /* --- TOP BAR --- */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; z-index: 50; }
@@ -125,20 +147,19 @@
         .tray-item {
             background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: var(--glass-blur);
             color: var(--text-main); height: 44px; display: flex; align-items: center; justify-content: center;
-            border-radius: 22px; transition: 0.3s var(--bounce); cursor: pointer;
+            border-radius: 22px; transition: 0.4s var(--bounce); cursor: pointer;
         }
-        .tray-item:hover { transform: scale(1.05); background: rgba(125,125,125,0.2); }
+        .tray-item:hover { transform: scale(1.1); background: rgba(125,125,125,0.2); }
         .clock { padding: 0 20px; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 80px; }
 
         /* --- NOTIFICATION CENTER --- */
         #notification-center {
             position: absolute; top: 60px; right: 0; width: 380px; max-height: 500px;
             background: var(--card-bg); border: 1px solid var(--glass-border);
-            /* 12px blur effect as requested */
             backdrop-filter: blur(12px); 
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); border-radius: 24px;
-            transform-origin: top right; transform: scale(0.9) translateY(-10px); 
-            opacity: 0; pointer-events: none; transition: 0.3s var(--bounce); z-index: 2000;
+            transform-origin: top right; transform: scale(0.5) translateY(-50px); 
+            opacity: 0; pointer-events: none; transition: 0.5s var(--bounce); z-index: 2000;
             display: flex; flex-direction: column; overflow: hidden;
         }
         #notification-center.active { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
@@ -152,50 +173,60 @@
         
         .nc-body { 
             padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
-            /* Hide Scrollbar */
             scrollbar-width: none; -ms-overflow-style: none;
         }
         .nc-body::-webkit-scrollbar { display: none; }
 
-        /* Markdown Card Styling inside Notifications */
         .notif-card {
             background: rgba(125,125,125,0.05); border: 1px solid var(--glass-border);
             border-radius: 16px; padding: 20px; font-size: 0.9rem; line-height: 1.5;
             color: var(--text-dim); transition: 0.2s;
         }
         .notif-card:hover { background: rgba(125,125,125,0.08); }
-        
-        /* Markdown Formatting */
         .notif-card h1, .notif-card h2, .notif-card h3 { color: var(--text-main); margin-bottom: 8px; margin-top: 15px; }
-        .notif-card h1:first-child, .notif-card h2:first-child { margin-top: 0; }
         .notif-card p { margin-bottom: 10px; }
-        .notif-card ul { padding-left: 20px; margin-bottom: 10px; }
-        .notif-card li { margin-bottom: 5px; }
         .notif-card a { color: var(--accent); text-decoration: none; }
         .notif-card code { background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
-        .notif-card hr { border: 0; height: 1px; background: var(--glass-border); margin: 15px 0; }
         .notif-loading { text-align: center; padding: 20px; color: var(--accent); }
+        
+        /* System Alerts in NC */
+        .sys-alert { border-left: 4px solid var(--accent); background: var(--accent-glow); color: white; }
 
-        /* --- TODO --- */
+        /* --- TODO & ALARMS --- */
         #todo-widget {
-            position: absolute; top: 60px; right: 0; width: 320px; background: var(--card-bg);
+            position: absolute; top: 60px; right: 0; width: 340px; background: var(--card-bg);
             border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-radius: 20px; padding: 20px;
-            transform-origin: top right; transform: scale(0.9) translateY(-10px); opacity: 0; pointer-events: none; transition: 0.3s var(--bounce); z-index: 2000;
+            transform-origin: top right; transform: scale(0.5) translateY(-50px); opacity: 0; pointer-events: none; transition: 0.5s var(--bounce); z-index: 2000;
         }
         #todo-widget.active { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
-        .todo-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .todo-input { flex: 1; background: rgba(125,125,125,0.1); border: none; padding: 8px 12px; border-radius: 8px; color: var(--text-main); }
-        .todo-list { list-style: none; max-height: 250px; overflow-y: auto; }
-        .todo-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid var(--glass-border); }
-        .todo-marker { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; }
-        .todo-text { flex: 1; font-size: 0.9rem; color: var(--text-main); }
-        .todo-del { color: #ef4444; cursor: pointer; opacity: 0.6; } .todo-del:hover { opacity: 1; transform: scale(1.1); }
+        
+        .todo-input-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .todo-input { flex: 1; background: rgba(125,125,125,0.1); border: none; padding: 8px 12px; border-radius: 8px; color: var(--text-main); font-size: 0.9rem; }
+        /* Time Input */
+        .time-input { width: 90px; background: rgba(125,125,125,0.1); border: none; padding: 8px; border-radius: 8px; color: var(--text-dim); font-size: 0.8rem; cursor: pointer; }
+        .time-input::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.5); cursor: pointer; }
+
+        .todo-list { list-style: none; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .todo-item { 
+            display: flex; align-items: center; padding: 12px; background: rgba(125,125,125,0.05); 
+            border-radius: 12px; border: 1px solid transparent; transition: 0.2s; 
+        }
+        .todo-item:hover { background: rgba(125,125,125,0.1); }
+        .todo-item.overdue { border-color: #ef4444; }
+        
+        .todo-marker { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+        .todo-content { flex: 1; display: flex; flex-direction: column; }
+        .todo-text { font-size: 0.9rem; color: var(--text-main); }
+        .todo-time { font-size: 0.7rem; color: var(--accent); margin-top: 2px; }
+        
+        .todo-del { color: #ef4444; cursor: pointer; opacity: 0.6; padding: 5px; } 
+        .todo-del:hover { opacity: 1; transform: scale(1.2); }
 
         /* --- VIEWPORT --- */
         .view-container { flex: 1; position: relative; width: 100%; display: flex; overflow: hidden; }
         .content-view {
-            position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: scale(0.96) translateY(10px);
-            transition: opacity 0.4s ease, transform 0.5s var(--fluid), visibility 0.4s; display: flex; flex-direction: column;
+            position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: scale(0.96) translateY(20px);
+            transition: opacity 0.4s ease, transform 0.6s var(--bounce), visibility 0.4s; display: flex; flex-direction: column;
         }
         .content-view.active-view { opacity: 1; visibility: visible; transform: scale(1) translateY(0); z-index: 10; }
 
@@ -229,31 +260,28 @@
         }
         .game-card:hover .card-title { opacity: 1; transform: translateY(0); }
 
-        /* Custom Deletion X */
         .card-del-btn {
             position: absolute; top: -10px; right: -10px; width: 30px; height: 30px;
             background: #ef4444; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 14px; opacity: 0; transform: scale(0.5); transition: 0.2s var(--bounce); z-index: 20;
+            font-weight: 800; font-size: 14px; opacity: 0; transform: scale(0.5); transition: 0.3s var(--bounce); z-index: 20;
             box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5);
         }
         .game-card:hover .card-del-btn { opacity: 1; transform: scale(1); top: -10px; right: -10px; }
         .card-del-btn:hover { transform: scale(1.2) rotate(90deg); background: #dc2626; }
 
-        /* Add Tile */
         .add-tile .card-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(125,125,125,0.05); }
-        .add-icon { font-size: 3rem; color: var(--text-dim); transition: 0.3s; }
-        .add-tile:hover .add-icon { color: var(--accent); transform: scale(1.2); }
+        .add-icon { font-size: 3rem; color: var(--text-dim); transition: 0.4s var(--bounce); }
+        .add-tile:hover .add-icon { color: var(--accent); transform: scale(1.3); }
         
-        /* New Badge */
+        /* New Badge (Always Visible & Enhanced) */
         .new-badge {
             position: absolute; top: 15px; right: 15px; background: #22c55e; color: #000; font-weight: 800; font-size: 0.75rem;
-            height: 28px; width: 28px; border-radius: 14px; display: flex; align-items: center; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.5); z-index: 5; transition: width 0.4s var(--bounce);
+            height: 28px; width: 70px; border-radius: 14px; display: flex; align-items: center; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.5); z-index: 5;
         }
-        .nb-content { display: flex; white-space: nowrap; }
+        .nb-content { display: flex; white-space: nowrap; width: 100%; }
         .nb-n { width: 28px; text-align: center; flex-shrink: 0; display: flex; justify-content: center; align-items: center; }
-        .nb-full { opacity: 0; transition: 0.3s; padding-right: 12px; }
-        .game-card:hover .new-badge { width: 70px; } .game-card:hover .nb-full { opacity: 1; }
+        .nb-full { opacity: 1; padding-right: 12px; }
 
         /* --- SETTINGS --- */
         #settings-view { align-items: center; justify-content: center; background: rgba(0,0,0,0.2); }
@@ -261,7 +289,6 @@
             width: 700px; max-height: 80vh; padding: 0; 
             overflow-y: auto; background: var(--card-bg); border-radius: 30px; 
             border: 1px solid var(--glass-border); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            /* Hide Scrollbar */
             scrollbar-width: none; -ms-overflow-style: none;
         }
         .settings-box::-webkit-scrollbar { display: none; }
@@ -273,7 +300,6 @@
         }
         .st-body { padding: 40px; }
         
-        /* Group Cards */
         .st-group { 
             background: rgba(125,125,125,0.03); border: 1px solid rgba(125,125,125,0.1); 
             border-radius: 20px; padding: 20px; margin-bottom: 20px; 
@@ -301,14 +327,13 @@
         .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: 0.2s; }
         .range-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
 
-        /* Buttons */
         .btn {
             padding: 10px 20px; border-radius: 12px; font-weight: 600; text-decoration: none;
-            transition: all 0.2s var(--bounce); display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.3s var(--bounce); display: inline-flex; align-items: center; justify-content: center;
             font-size: 0.9rem; cursor: pointer; border: none;
         }
         .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--accent-glow); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 20px var(--accent-glow); }
         .btn-danger { background: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.2); }
         .btn-danger:hover { background: rgba(220, 38, 38, 0.2); color: #fff; }
         .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--glass-border); }
@@ -321,7 +346,6 @@
         }
         .beta-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
-        /* Arrows */
         .scroll-arrow {
             position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border-radius: 50%;
             background: rgba(125,125,125,0.1); display: flex; justify-content: center; align-items: center;
@@ -336,22 +360,27 @@
 </head>
 <body>
 
-    <!-- OOBE LAYER -->
+    <!-- OOBE LAYER (Pill UI) -->
     <div id="oobe-overlay">
-        <div class="hello-word" id="oobe-text">NexusOS 9.1</div>
-        <div class="oobe-controls oobe-btn" id="oobe-controls">
-            <button class="btn btn-primary" onclick="OOBE.finish()">Enter System</button>
+        <div class="pill-container">
+            <div class="pill-header">NexusOS 11</div>
+            <div class="pill-desc">Select a Tab Cloak to begin your session.</div>
+            
+            <!-- In-Pill Spoof Grid -->
+            <div class="spoof-grid" id="oobe-spoof-grid" style="max-height: 200px; margin-bottom: 25px;"></div>
+            
+            <button class="btn btn-primary" style="width:100%" onclick="OOBE.finish()">Enter System</button>
         </div>
     </div>
 
-    <!-- SPOOF MODAL -->
+    <!-- SPOOF MODAL (Settings) -->
     <div id="spoof-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
                 <span class="modal-title">Tab Cloak</span>
                 <button class="btn btn-danger" style="padding:6px 12px;" onclick="Modals.close('spoof-modal')">Close</button>
             </div>
-            <div class="spoof-grid" id="spoof-grid"></div>
+            <div class="spoof-grid" id="settings-spoof-grid"></div>
         </div>
     </div>
 
@@ -415,10 +444,11 @@
                     </div>
                 </div>
 
-                <!-- TODO LIST -->
+                <!-- TODO WIDGET -->
                 <div id="todo-widget">
                     <div class="todo-input-group">
                         <input type="text" class="todo-input" id="todo-input" placeholder="Task..." onkeypress="Todo.handleInput(event)">
+                        <input type="time" class="time-input" id="todo-time" title="Set Alarm">
                         <button class="btn btn-primary" style="padding:0 12px;" onclick="Todo.add()">+</button>
                     </div>
                     <ul class="todo-list" id="todo-list"></ul>
@@ -500,8 +530,8 @@
     <script>
         /* --- STATE --- */
         const State = {
-            version: "9.1",
-            oobeKey: "nx_oobe_v9_1",
+            version: "11.0",
+            oobeKey: "nx_oobe_v11",
             settings: {
                 time24: localStorage.getItem('nx_time24') === 'true',
                 preventClose: localStorage.getItem('nx_prevent') === 'true',
@@ -509,17 +539,25 @@
                 bg: localStorage.getItem('nx_bg') || '',
                 todos: JSON.parse(localStorage.getItem('nx_todos') || '[]'),
                 lightMode: localStorage.getItem('nx_light') === 'true',
-                tilt: parseInt(localStorage.getItem('nx_tilt') || '500'), // Default 500
+                tilt: parseInt(localStorage.getItem('nx_tilt') || '500'),
                 customGames: JSON.parse(localStorage.getItem('nx_custom_games') || '[]')
             }
         };
 
         const DefaultGames = [
-            { title: "BitLife", url: "https://nexusx.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=80&w=1000&auto=format&fit=crop", isNew: true },
-            { title: "Snow Rider 3D", url: "https://nexusx.w3spaces.com/snow.html", image: "https://images.pexels.com/photos/688660/pexels-photo-688660.jpeg", isNew: true },
-            { title: "Tetris", url: "https://nexusx.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?w=1920", isNew: true },
+            { title: "Froggies Arcade", url: "https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/", image: "https://picsum.photos/200/300", isNew: true },
             { title: "GNMath V2", url: "https://nexusx.w3spaces.com/gnmath.html", image: "https://images.unsplash.com/photo-1648700231913-ad061d9b3ec9?w=1920", isNew: true },
+            { title: "EndisOS", url: "https://zinko.sbs/", image: "https://picsum.photos/seed/picsum/200/300", isNew: true },
+            { title: "Silk", url: "https://nexusx.w3spaces.com/silk.html", image: "https://picsum.photos/seed/picsum/200/300" },
+            { title: "Demon", url: "https://nexusx.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=80&w=774", isNew: true },
+            { title: "Oregon Trail", url: "https://oregontrail.ws/the-oregon-trail-game/", image: "https://picsum.photos/200/300", isNew: true },
+            { title: "Mesh", url: "https://me.meshcapade.com/editor", image: "https://picsum.photos/200/300", isNew: true },
+            { title: "Willway", url: "https://admin.internetspeedtest.world/", image: "https://picsum.photos/200/300", isNew: true },
+            { title: "FC Games", url: "https://agreeable-mud-098a6b110.1.azurestaticapps.net/", image: "https://picsum.photos/200/300", isNew: true },
+            { title: "BitLife", url: "https://nexusx.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=80&w=1000&auto=format&fit=crop", isNew: true },
+            { title: "Snow Rider 3D", url: "https://nexusx.w3spaces.com/snow.html", image: "https://plus.unsplash.com/premium_photo-1719930221794-0680e7fd8071", isNew: true },
             { title: "Snake", url: "https://nexusx.w3spaces.com/snake.html", image: "https://images.unsplash.com/photo-1739869610059-86fabc7bcd7b?fit=clip&w=2500" },
+            { title: "Tetris", url: "https://nexusx.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?w=1920"},
             { title: "Hex", url: "https://www.nddb.coop/ccnddb/games/Hexagon Twist/", image: "https://images.unsplash.com/vector-1761047846560-52720ea86a46?w=1920" },
             { title: "Dino Run", url: "https://nexusx.w3spaces.com/dino.html", image: "https://images.unsplash.com/vector-1761941086671-a623243d84a3?w=1920" },
             { title: "Flappy Bird", url: "https://nexusx.w3spaces.com/bird.html", image: "https://images.unsplash.com/photo-1732198246906-8168ef1ff6bc?q=80&w=1740" },
@@ -528,16 +566,21 @@
             { title: "Bank Heist", url: "https://nexusx.w3spaces.com/bank.html", image: "https://images.unsplash.com/photo-1738691035045-3fb009e8aa26?fit=clip&w=2500" },
             { title: "Slither.io", url: "https://nexusx.w3spaces.com/snakeio.html", image: "https://images.unsplash.com/photo-1736613403120-8d48aebd29e1?fit=clip&w=2500" },
             { title: "Escape Road", url: "https://nexusx.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=80&w=774" },
+            { title: "Ruffle", url: "https://nexusx.w3spaces.com/emu.html", image: "https://picsum.photos/200/300", isNew: true },          
         ];
 
         const Spoofs = [
-            { id: 'none', t: 'NexusOS 9.1', i: 'https://www.google.com/favicon.ico' },
+            { id: 'none', t: 'NexusOS 11', i: 'https://www.google.com/favicon.ico' },
             { id: 'google', t: 'Google', i: 'https://www.google.com/favicon.ico' },
             { id: 'canvas', t: 'Dashboard', i: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico' },
             { id: 'clever', t: 'Clever | Portal', i: 'https://assets.clever.com/favicon.ico' },
             { id: 'classroom', t: 'Classes', i: 'https://ssl.gstatic.com/classroom/favicon.png' },
             { id: 'drive', t: 'My Drive', i: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' },
-            { id: 'gmail', t: 'Inbox', i: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico' }
+            { id: 'gmail', t: 'Inbox', i: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico' },
+            { id: 'zoom', t: 'Zoom Meeting', i: 'https://st1.zoom.us/zoom.ico' },
+            { id: 'kahoot', t: 'Enter Game PIN!', i: 'https://kahoot.it/favicon.ico' },
+            { id: 'quizlet', t: 'Quizlet', i: 'https://assets.quizlet.com/a/j/favicon-32x32.e762772.png' },
+            { id: 'wikipedia', t: 'Wikipedia', i: 'https://en.wikipedia.org/static/favicon/wikipedia.ico' }
         ];
 
         /* --- LOGIC --- */
@@ -563,24 +606,31 @@
                 const el = document.getElementById('notification-center');
                 const isActive = el.classList.toggle('active');
                 if(isActive && !Notifications.loaded) Notifications.reload();
-                // Close Todo if open
                 if(isActive) document.getElementById('todo-widget').classList.remove('active');
             },
             reload: () => {
                 const content = document.getElementById('notif-content');
-                content.innerHTML = '<div class="notif-loading">Updating...</div>';
+                content.innerHTML = '<div class="notif-loading">Checking...</div>';
                 fetch('https://raw.githubusercontent.com/StrikerXR/NexusX-assets/refs/heads/main/notification.md')
                     .then(r => r.text())
                     .then(text => {
-                        // Parse markdown using Marked.js
                         const html = marked.parse(text);
-                        // Wrap in a card for better styling
                         content.innerHTML = `<div class="notif-card">${html}</div>`;
                         Notifications.loaded = true;
                     })
                     .catch(e => {
-                        content.innerHTML = `<div class="notif-card" style="color:#ef4444">Failed to load notifications.<br>Check internet connection.</div>`;
+                        content.innerHTML = `<div class="notif-card" style="color:#ef4444">Failed to load notifications.</div>`;
                     });
+            },
+            pushLocal: (title, msg) => {
+                const content = document.getElementById('notif-content');
+                const alertHtml = `<div class="notif-card sys-alert"><h3>${title}</h3><p>${msg}</p></div>`;
+                content.insertAdjacentHTML('afterbegin', alertHtml);
+                
+                // Visual cue
+                const btn = document.querySelector('.system-tray .icon-btn');
+                btn.style.color = '#3b82f6';
+                setTimeout(() => btn.style.color = '', 4000);
             }
         };
 
@@ -598,7 +648,6 @@
                     
                     let html = ``;
                     if(g.isNew) html += `<div class="new-badge"><div class="nb-content"><div class="nb-n">N</div><div class="nb-full">ew</div></div></div>`;
-                    // Red X for Custom Apps Only
                     if(isCustom) html += `<div class="card-del-btn" onclick="event.stopPropagation(); Games.removeCustom(${i - DefaultGames.length})">✕</div>`;
 
                     html += `<div class="card-inner"><img src="${g.image}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
@@ -637,9 +686,8 @@
             addTilt: (card) => {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
-                    // Refined math: 0-1000 input maps to a factor
-                    const tiltFactor = State.settings.tilt / 1000; // 0.0 to 1.0
-                    const maxRot = 25; // Max degrees
+                    const tiltFactor = State.settings.tilt / 1000;
+                    const maxRot = 25;
 
                     const x = (e.clientX - rect.left - rect.width/2) / (rect.width/2);
                     const y = -(e.clientY - rect.top - rect.height/2) / (rect.height/2);
@@ -718,7 +766,9 @@
                 let h = now.getHours();
                 let m = now.getMinutes();
                 
-                // Manual 12h/24h formatting to remove AM/PM
+                // Check Todo Alarms
+                Todo.checkAlarms(h, m);
+
                 if(!State.settings.time24) {
                     h = h % 12;
                     if(h === 0) h = 12;
@@ -737,16 +787,35 @@
             handleInput: (e) => { if(e.key==='Enter') Todo.add(); },
             add: () => {
                 const input = document.getElementById('todo-input');
+                const timeInput = document.getElementById('todo-time');
                 if(!input.value.trim()) return;
-                State.settings.todos.push({ t: input.value.trim() });
+                
+                State.settings.todos.push({ 
+                    t: input.value.trim(), 
+                    time: timeInput.value, // "14:30" format
+                    notified: false 
+                });
                 Settings.save('nx_todos', JSON.stringify(State.settings.todos));
                 Todo.render();
-                input.value = "";
+                input.value = ""; timeInput.value = "";
             },
             remove: (i) => {
                 State.settings.todos.splice(i, 1);
                 Settings.save('nx_todos', JSON.stringify(State.settings.todos));
                 Todo.render();
+            },
+            checkAlarms: (h, m) => {
+                const currentStr = `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}`;
+                let changed = false;
+                State.settings.todos.forEach(item => {
+                    if(item.time && !item.notified && item.time === currentStr) {
+                        item.notified = true;
+                        changed = true;
+                        Notifications.pushLocal("Reminder", item.t);
+                        Notifications.toggle(); // Auto open notifs
+                    }
+                });
+                if(changed) Settings.save('nx_todos', JSON.stringify(State.settings.todos));
             },
             render: () => {
                 const list = document.getElementById('todo-list');
@@ -754,7 +823,15 @@
                 State.settings.todos.forEach((item, i) => {
                     let li = document.createElement('li');
                     li.className = "todo-item";
-                    li.innerHTML = `<div class="todo-marker" style="background:#3b82f6"></div><span class="todo-text">${item.t}</span><div class="todo-del" onclick="Todo.remove(${i})">✕</div>`;
+                    let timeBadge = item.time ? `<div class="todo-time">⏰ ${item.time}</div>` : '';
+                    li.innerHTML = `
+                        <div class="todo-marker" style="background:${item.notified ? '#22c55e' : '#3b82f6'}"></div>
+                        <div class="todo-content">
+                            <span class="todo-text">${item.t}</span>
+                            ${timeBadge}
+                        </div>
+                        <div class="todo-del" onclick="Todo.remove(${i})">✕</div>
+                    `;
                     list.appendChild(li);
                 });
             }
@@ -790,7 +867,6 @@
                 Settings.save('nx_custom_games', JSON.stringify(State.settings.customGames));
                 Games.render();
                 Modals.close('add-game-modal');
-                // Cleanup
                 document.getElementById('ag-title').value=""; document.getElementById('ag-url').value="";
             }
         };
@@ -815,35 +891,35 @@
             init: () => {
                 if(!localStorage.getItem(State.oobeKey)) {
                     document.getElementById('oobe-overlay').style.display = 'flex';
-                    const txt = document.getElementById('oobe-text');
-                    setTimeout(() => { txt.style.opacity=1; txt.style.transform="translateY(0)"; }, 100);
-                    setTimeout(() => document.getElementById('oobe-controls').style.opacity=1, 2000);
+                    // Render Spoofs in OOBE pill
+                    const grid = document.getElementById('oobe-spoof-grid');
+                    Spoofs.forEach(s => {
+                         let d = document.createElement('div'); d.className = "spoof-item"; d.dataset.id = s.id;
+                         d.innerHTML = `<img src="${s.i}" class="spoof-icon"><div class="spoof-name">${s.t}</div>`;
+                         d.onclick = () => Settings.setCloak(s.id);
+                         grid.appendChild(d);
+                    });
+                    
+                    setTimeout(() => document.getElementById('oobe-overlay').classList.add('active'), 50);
                 } else {
                     document.getElementById('main-interface').classList.add('unlocked');
                 }
             },
             finish: () => {
                 localStorage.setItem(State.oobeKey, 'true');
-                document.getElementById('oobe-overlay').style.opacity = 0;
+                document.getElementById('oobe-overlay').classList.remove('active');
                 setTimeout(() => {
                     document.getElementById('oobe-overlay').style.display = 'none';
                     document.getElementById('main-interface').classList.add('unlocked');
-                }, 1000);
+                }, 800);
             },
             reset: () => { if(confirm("Reset Everything?")) { localStorage.clear(); location.reload(); } }
         };
 
         window.onload = () => {
-            // --- SCREEN SIZE KICKSTART FIX ---
-            // Forces a zoom out then back in to fix specific mobile scaling bugs
             if(window.innerWidth < 800) {
-                const metaViewport = document.querySelector('meta[name="viewport"]');
-                if(metaViewport) {
-                    metaViewport.setAttribute('content', 'width=device-width, initial-scale=0.1');
-                    setTimeout(() => {
-                        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
-                    }, 50);
-                }
+                const meta = document.querySelector('meta[name="viewport"]');
+                if(meta) { meta.setAttribute('content', 'width=device-width, initial-scale=0.1'); setTimeout(() => meta.setAttribute('content', 'width=device-width, initial-scale=1.0'), 50); }
             }
 
             Settings.apply();
@@ -852,7 +928,8 @@
             Clock.update();
             setInterval(Clock.update, 1000);
             
-            const sg = document.getElementById('spoof-grid');
+            // Populate Settings Spoof Grid
+            const sg = document.getElementById('settings-spoof-grid');
             Spoofs.forEach(s => {
                 let d = document.createElement('div'); d.className = "spoof-item"; d.dataset.id = s.id;
                 d.innerHTML = `<img src="${s.i}" class="spoof-icon"><div class="spoof-name">${s.t}</div>`;
