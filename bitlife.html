@@ -1,53 +1,212 @@
- 
-
-<!-- Ultimate Game Stash file--> 
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>BitLife - Life Simulator</title>
+    
     <style>
-		body{font-family:"Myriad Pro", Myriad ,"Helvetica Neue",Helvetica,Arial,sans-serif}body{margin:0;padding:0;position:absolute;height:100%;width:100%;background-size:cover;font-style:regular;font-family:"Myriad Pro", Myriad ,"Helvetica Neue",Helvetica,Arial,sans-serif}.webgl-content{background:#333}#errorBrowserBlock,#loadingBlock,.webgl-content{padding:0;position:absolute;height:100vh;width:100vw}canvas{position:absolute;height:100%;width:100%}#gameContainer{position:absolute;height:100%;width:100%}#fullScreenButton,#logoname{height:35px;width:35px;position:absolute;bottom:5px;right:5px;background-color:transparent;background-image:url(../img/fullScreen_on.png);background-size:35px 35px;border:none;cursor:pointer}#logoname{background-image:url(../img/logo-big.png);left:15px;bottom:11px;width:141px;height:20px;background-size:141px 20px}.subtitle{color:#fff;font-size:15px;padding-bottom:15px;padding-top:15px;display:block;margin:auto;text-align:center}.logo{display:block;margin:20px auto;width:265px;height:60px}.logo-game{height:150px;width:auto;display:block;margin:auto;margin-top:5px;border-radius:20px;box-shadow:0 20px 20px -10px rgba(0,0,0,.3)}#errorBrowserBlock,#loadingBlock{background:#333;background-size:cover;z-index:1}.cover{position:absolute;z-index:-1;top:0;right:0;bottom:0;left:0;-moz-background-size:cover;-webkit-background-size:cover;background-size:cover;opacity:.5;filter:blur(16px)}#errorContent,#progressBar,#warningBrowserBlock,#warningMobileBlock{height:25vh;width:40vw;margin:auto;text-align:center}#progressBar{height:8vh;color:#fff;font-size:4vh}#errorContent,#warningBrowserBlock,#warningMobileBlock{margin-top:15vh;color:#fff;font-size:2.3vh}.browserIcons{display:inline-flex;margin-top:2vh}.browserIcons a{width:150px}#errorContent{font-size:3vh;margin-top:5vh}.centered{height:100%;max-width:770px;margin-left:auto;margin-right:auto}.webgl-content *{border:0;margin:0;padding:0}.webgl-content{height:100%;width:100%}.progress,.webgl-content .logo{position:absolute;left:50%;top:45%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%)}.webgl-content .logo{background:url(logo.png) no-repeat center/contain;width:130px;height:130px}.webgl-content .progress{height:18px;width:141px;margin-top:90px}.webgl-content .progress .empty{background:url(TemplateData/progressEmpty.Light.png) no-repeat right/cover;float:right;width:100%;height:100%;display:inline-block}.webgl-content .progress .full{background:url(TemplateData/progressFull.Light.png) no-repeat left/cover;float:left;width:0%;height:100%;display:inline-block}.webgl-content .logo.Dark{background-image:url(logo.png)}.webgl-content .progress.Dark .empty{background-image:url(TemplateData/progressEmpty.Dark.png)}.webgl-content .progress.Dark .full{background-image:url(TemplateData/progressFull.Dark.png)}.webgl-content .footer{margin-top:5px;height:38px;line-height:38px;font-family:Helvetica,Verdana,Arial,sans-serif;font-size:18px}.fullscreen,.title,.webgl-content .footer .webgl-logo{height:100%;display:inline-block;background:transparent center no-repeat}.webgl-content .footer .webgl-logo{background-image:url(TemplateData/webgl-logo.png);width:204px;float:left}.webgl-content .footer .title{margin-right:10px;float:right}.webgl-content .footer .fullscreen{background-image:url(TemplateData/fullscreen.png);width:38px;float:right}
-        body,html{margin:0 auto;padding:0 auto;width:62vh;height:100%;overflow:hidden}#links2{position:absolute;right:0;bottom:0;padding:8px;list-style:none;background-color:#fff;border-top-left-radius:5px}#links2 ul{list-style-type:none;margin:0;padding:0}#links2 ul li{display:inline}#links2 ul li a{color:#000;display:inline-block;margin-right:10px;text-decoration:none}#links2 ul li a.visited{color:#000}#links2 ul li a:hover{opacity:.85}
-	</style>
-	  <link rel="canonical" href="/">
-	<script src="https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/TemplateData/UnityProgress.js"></script>
+        /* --- General Reset & Layout --- */
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* --- Background Effects (Desktop) --- */
+        .background-blur {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #ff4b4b 0%, #d4145a 100%); /* BitLife Red Theme */
+            filter: blur(20px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        /* --- Game Container (Phone Simulation) --- */
+        .game-wrapper {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameContainer {
+            width: 100%;
+            height: 100%;
+            /* On desktop, limit width to look like a phone */
+            max-width: 60vh; 
+            background: #000;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* --- Loading Screen Elements (Required by UnityLoader) --- */
+        .webgl-content {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0; left: 0;
+        }
+        
+        /* Customizing the Unity Loading Bar */
+        .webgl-content .logo {
+            background: url('https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/TemplateData/logo.png') no-repeat center/contain;
+            width: 150px;
+            height: 150px;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .webgl-content .progress {
+            height: 20px;
+            width: 200px;
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .webgl-content .progress .full {
+            background: #d4145a; /* BitLife Red */
+            height: 100%;
+            width: 0%; 
+        }
+
+        /* --- Custom UI Overlay (Header/Footer) --- */
+        .ui-header {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 60vh;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            color: white;
+            transition: top 0.3s;
+        }
+
+        .ui-header h1 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .close-btn:hover { opacity: 1; }
+
+        /* Fullscreen Button */
+        .fs-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .fs-btn:hover { background: rgba(255,255,255,0.4); }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            #gameContainer, .ui-header { max-width: 100%; }
+            .background-blur { display: none; } /* Performance on mobile */
+        }
+    </style>
+
+    <!-- Unity Scripts -->
+    <script src="https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/TemplateData/UnityProgress.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/Build/UnityLoader.js"></script>
+    
     <script>
-      var unityInstance = UnityLoader.instantiate("gameContainer", "https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/Build/BitLife.json", {onProgress: UnityProgress});
+        // Load Unity Instance
+        var unityInstance = UnityLoader.instantiate("gameContainer", "https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/Build/BitLife.json", {onProgress: UnityProgress});
     </script>
+</head>
+<body>
 
-  </head>
-  <body>
-    <div id="listLink" style="width: 100%; text-align: center; position: absolute; top: 0px; z-index: 999; background: rgb(119, 119, 255); opacity: 0.8;">
+    <!-- Aesthetic Background -->
+    <div class="background-blur"></div>
 
-      <ul style="color: #ffffff; padding: 0px; margin: 0px; font-size: 20px;">
-          <li style="padding: 5px; display: inline-block; float: left;">
-          <a href="" style="color: #ffffff; text-decoration: none;">Bitlife</a>
-          </li>
-          <li style="padding: 5px; display: inline-block; float: right;">
-          <a onclick="return closeBacklinks();" style="color: #ffffff; text-decoration: none;">❌</a>
-          </li>
-      </ul>
-  </div>
-  <div class="webgl-content">
-      <div id="gameContainer" style="width: 100%; height: 100%;"></div>
+    <!-- Main Layout -->
+    <div class="game-wrapper">
+        
+        <!-- Header Overlay -->
+        <div id="uiHeader" class="ui-header">
+            <h1>BitLife</h1>
+            <button class="close-btn" onclick="toggleHeader()" title="Toggle Header">✕</button>
+        </div>
+
+        <!-- The Game -->
+        <div id="gameContainer"></div>
+
+        <!-- Fullscreen Toggle -->
+        <button class="fs-btn" onclick="toggleFullScreen()">⛶</button>
+
     </div>
-    <script>
-      function closeBacklinks(){
-        document.querySelector('#listLink').style.display = "none";
-    }
-    </script>
-  </body>
-</html>
-clbitlife.html
 
-Displaying clbitlife.html.
+    <script>
+        // Toggle the visibility of the top bar
+        function toggleHeader(){
+            const header = document.getElementById('uiHeader');
+            header.style.display = 'none';
+        }
+
+        // Fullscreen Logic
+        function toggleFullScreen() {
+            var el = document.getElementById('gameContainer');
+            if (!document.fullscreenElement) {
+                if (el.requestFullscreen) {
+                    el.requestFullscreen();
+                } else if (el.webkitRequestFullscreen) { /* Safari */
+                    el.webkitRequestFullscreen();
+                } else if (el.msRequestFullscreen) { /* IE11 */
+                    el.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
