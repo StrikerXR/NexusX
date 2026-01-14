@@ -1,0 +1,293 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]: NexusX
+    - generic [ref=e6]: Select a Tab Cloak to begin your session.
+    - generic [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e10]: NexusOS 12.2.1
+      - generic [ref=e11] [cursor=pointer]:
+        - img [ref=e12]
+        - generic [ref=e13]: Google
+      - generic [ref=e14] [cursor=pointer]:
+        - img [ref=e15]
+        - generic [ref=e16]: Dashboard
+      - generic [ref=e17] [cursor=pointer]:
+        - img [ref=e18]
+        - generic [ref=e19]: Clever | Portal
+      - generic [ref=e20] [cursor=pointer]:
+        - img [ref=e21]
+        - generic [ref=e22]: Classes
+      - generic [ref=e23] [cursor=pointer]:
+        - img [ref=e24]
+        - generic [ref=e25]: My Drive
+      - generic [ref=e26] [cursor=pointer]:
+        - img [ref=e27]
+        - generic [ref=e28]: Inbox
+      - generic [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - generic [ref=e31]: Zoom Meeting
+      - generic [ref=e32] [cursor=pointer]:
+        - img [ref=e33]
+        - generic [ref=e34]: Enter Game PIN!
+      - generic [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e37]: Quizlet
+      - generic [ref=e38] [cursor=pointer]:
+        - img [ref=e39]
+        - generic [ref=e40]: Wikipedia
+      - generic [ref=e41] [cursor=pointer]:
+        - img [ref=e42]
+        - generic [ref=e43]: Discord
+      - generic [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e46]: Spotify - Web Player
+      - generic [ref=e47] [cursor=pointer]:
+        - img [ref=e48]
+        - generic [ref=e49]: Reddit
+      - generic [ref=e50] [cursor=pointer]:
+        - img [ref=e51]
+        - generic [ref=e52]: X
+    - button "Enter System" [ref=e53] [cursor=pointer]
+  - generic:
+    - generic:
+      - generic:
+        - generic: Tab Cloak
+        - button "Close"
+      - generic:
+        - generic:
+          - img
+          - generic: NexusOS 12.2.1
+        - generic:
+          - img
+          - generic: Google
+        - generic:
+          - img
+          - generic: Dashboard
+        - generic:
+          - img
+          - generic: Clever | Portal
+        - generic:
+          - img
+          - generic: Classes
+        - generic:
+          - img
+          - generic: My Drive
+        - generic:
+          - img
+          - generic: Inbox
+        - generic:
+          - img
+          - generic: Zoom Meeting
+        - generic:
+          - img
+          - generic: Enter Game PIN!
+        - generic:
+          - img
+          - generic: Quizlet
+        - generic:
+          - img
+          - generic: Wikipedia
+        - generic:
+          - img
+          - generic: Discord
+        - generic:
+          - img
+          - generic: Spotify - Web Player
+        - generic:
+          - img
+          - generic: Reddit
+        - generic:
+          - img
+          - generic: X
+  - generic:
+    - generic:
+      - generic:
+        - generic: Add Custom App
+        - button "Cancel"
+      - generic:
+        - textbox "App Name (e.g., Minecraft)"
+        - textbox "URL (e.g., https://game.com)"
+        - generic:
+          - button "Use Favicon"
+          - button "Custom Image"
+        - button "Add to Library"
+  - generic:
+    - generic:
+      - generic:
+        - generic: What's New in NexusOS 12.2.1
+        - button "Continue"
+      - generic:
+        - generic:
+          - heading "Changelog" [level=2]
+          - list:
+            - listitem: • Updated to version 12.2.1
+            - listitem: • Added mobile support for a better experience on smaller devices
+            - listitem: • Added a setting to disable the mobile UI
+            - listitem: • Improved the UI and underlying technology of the snow game
+  - generic:
+    - generic:
+      - generic:
+        - generic: Library
+        - generic: Settings
+      - generic:
+        - generic: 1:25
+        - generic:
+          - img
+        - generic:
+          - img
+        - generic:
+          - img
+        - generic:
+          - generic:
+            - generic: Notifications
+            - button "Refresh"
+          - generic:
+            - generic: Loading Updates...
+        - generic:
+          - generic:
+            - textbox "Task..."
+            - textbox "Set Alarm"
+            - button:
+              - img
+          - list
+    - generic:
+      - generic:
+        - generic:
+          - generic: Froggies Arcade
+          - generic:
+            - link "Launch":
+              - /url: https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/
+        - generic:
+          - generic:
+            - img
+          - generic:
+            - img
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: Froggies Arcade
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: GNMath V2
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: BitLife
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: Snow Rider 3D
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: Demon
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: Oregon Trail
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: Mesh
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: Willway
+            - generic:
+              - generic:
+                - generic:
+                  - generic: "N"
+                  - generic: ew
+              - generic:
+                - img
+              - generic: FC Games
+            - generic:
+              - generic:
+                - img
+              - generic: Silk
+            - generic:
+              - generic:
+                - img
+              - generic: Snake
+            - generic:
+              - generic:
+                - img
+              - generic: Tetris
+            - generic:
+              - generic:
+                - img
+              - generic: Hex
+            - generic:
+              - generic:
+                - img
+              - generic: Dino Run
+            - generic:
+              - generic:
+                - img
+              - generic: Flappy Bird
+            - generic:
+              - generic:
+                - img
+              - generic: Drive Mad
+            - generic:
+              - generic:
+                - img
+              - generic: Bank Heist
+            - generic:
+              - generic:
+                - img
+              - generic: Slither.io
+            - generic:
+              - generic:
+                - img
+              - generic: Escape Road
+            - generic:
+              - generic:
+                - generic:
+                  - img
+  - generic:
+    - generic:
+      - generic: NexusX Player
+      - generic:
+        - img
+    - iframe [ref=e56]:
+
+```

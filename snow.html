@@ -1,184 +1,317 @@
- <!-- Ultimate Game Stash file--> 
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-
-
-
-</style><script src="https://26515722-282596139816136697.preview.editmysite.com/uploads/b/7547235-562404422326578714/files/offlineClient.js"></script><style type="text/css">#button {
-  display:none;
-}
-.imgb_vis {
-  animation: imgb-animation 7s linear;
-}
-@keyframes imgb-animation {
-  10% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(100px);
-  }
-  90% {
-    transform: translateX(100px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}</style></head><body dir="ltr" style="cursor: auto;"> 
-	<div id="fb-root"></div>
-	
-	<script>
-
- function On_GameLoaded()
-  {
-    isGameLoaded = true;
-  }
-  
-	  function Show_Ads()
-  {
-    c2_callFunction("On_GameResumed");
-    showad1();
-
-  }
-
-	// Issue a warning if trying to preview an exported project on disk.
-	(function(){
-		// Check for running exported on file protocol
-		if (window.location.protocol.substr(0, 4) ==="file")
-		{
-			alert("Exported games won't work until you upload them. (When running on the file:/// protocol, browsers block many features from working for security reasons.)");
-		}
-	})();
-	</script>
-	
-	<!-- The canvas must be inside a div called c2canvasdiv -->
-	<div id="c2canvasdiv" style="width: 1262px; height: 928px; margin-left: 0px; margin-top: 0px;">
-	
-		<!-- The canvas the project will render to.  If you change its ID, don't forget to change the
-		ID the runtime looks for in the jQuery events above (ready() and cr_sizeCanvas()). -->
-		<canvas height="928" id="c2canvas" width="1262" style="width: 1262px; height: 928px;">
-			<!-- This text is displayed if the visitor's browser does not support HTML5.
-			You can change it, but it is a good idea to link to a description of a browser
-			and provide some links to download some popular HTML5-compatible browsers. -->
-			<h1>Your browser does not appear to support HTML5.  Try upgrading your browser to the latest version.  <a href="http://www.whatbrowser.org">What is a browser?</a>
-			<br><br><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx">Microsoft Internet Explorer</a><br>
-			<a href="http://www.mozilla.com/firefox/">Mozilla Firefox</a><br>
-			<a href="http://www.google.com/chrome/">Google Chrome</a><br>
-			<a href="http://www.apple.com/safari/download/">Apple Safari</a></h1>
-		</canvas>
-		
-	
-	<!-- Pages load faster with scripts at the bottom -->
-	
-	<!-- Construct 2 exported games require jQuery. -->
-	<script src="https://26515722-282596139816136697.preview.editmysite.com/uploads/b/7547235-562404422326578714/files/jquery-2.1.1.min.js"></script>
-
-
-	
-    <!-- The runtime script.  You can rename it, but don't forget to rename the reference here as well.
-    This file will have been minified and obfuscated if you enabled "Minify script" during export. -->
-	<script src="https://26515722-282596139816136697.preview.editmysite.com/uploads/b/7547235-562404422326578714/files/c2runtime.js"></script>
-
-    <script>
-		// Start the Construct 2 project running on window load.
-		jQuery(document).ready(function ()
-		{			
-			// Create new runtime using the c2canvas
-			cr_createRuntime("c2canvas");
-		});
-		
-		// Pause and resume on page becoming visible/invisible
-		function onVisibilityChanged() {
-			if (document.hidden || document.mozHidden || document.webkitHidden || document.msHidden)
-				cr_setSuspended(true);
-			else
-				cr_setSuspended(false);
-		};
-		
-		document.addEventListener("visibilitychange", onVisibilityChanged, false);
-		document.addEventListener("mozvisibilitychange", onVisibilityChanged, false);
-		document.addEventListener("webkitvisibilitychange", onVisibilityChanged, false);
-		document.addEventListener("msvisibilitychange", onVisibilityChanged, false);
-		
-		function OnRegisterSWError(e)
-		{
-			console.warn("Failed to register service worker: ", e);
-		};
-		
-		// Runtime calls this global method when ready to start caching (i.e. after startup).
-		// This registers the service worker which caches resources for offline support.
-		window.C2_RegisterSW = function C2_RegisterSW()
-		{
-			if (!navigator.serviceWorker)
-				return;		// no SW support, ignore call
-			
-			try {
-				navigator.serviceWorker.register("sw.js", { scope: "./" })
-				.then(function (reg)
-				{
-					console.log("Registered service worker on " + reg.scope);
-				})
-				.catch(OnRegisterSWError);
-			}
-			catch (e)
-			{
-				OnRegisterSWError(e);
-			}
-		};
-    </script>
-	<script src=""></script>
- 
-
-<script>gadgets.util.runOnLoadHandlers();</script><script>window.google.csi.tickDl();
-</script></body></html>
-</style><style type="text/css">
-		* {
-			padding: 0;
-			margin: 0;
-		}
-		html, body {
-			background: #000;
-			color: #fff;
-			overflow: hidden;
-			touch-action: none;
-			-ms-touch-action: none;
-		}
-		canvas {
-			touch-action-delay: none;
-			touch-action: none;
-			-ms-touch-action: none;
-		}
-		@font-face {
-		    font-family: Oswald Regular;
-		    src: url(https://26515722-282596139816136697.preview.editmysite.com/uploads/b/7547235-562404422326578714/files/oswald_regular.ttf);
-		}
-		html, body {
-	padding: 0;
-	margin: 0;
-	overflow: hidden;
-	
-	background: #000000;
-}
-
-html, body, canvas {
-	touch-action: none;
-	touch-action-delay: none;
-}
-
-    </style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-	<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-	<title>Snake</title>
-	<meta content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no" name="viewport">
-	
-	<!-- Allow fullscreen mode on iOS devices. (These are Apple specific meta tags.) -->
-	<meta content="true" name="HandheldFriendly">
-	
-	<!-- Chrome for Android web app tags -->
-	<meta content="yes" name="mobile-web-app-capable">
-	  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man</title>
+    <style>
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            width: 560px;
+            height: 560px;
+            border: solid black;
+        }
 
+        .grid div {
+            width: 20px;
+            height: 20px;
+        }
 
+        .pac-dot {
+            background-color: green;
+            border: 5px solid white;
+            box-sizing: border-box;
+        }
 
-    <!-- All margins and padding must be zero for the canvas to fill the screen. -->
-	
-</div>	
-<script>
+        .wall {
+            background-color: blue;
+        }
+
+        .power-pellet {
+            background-color: green;
+            border-radius: 10px;
+        }
+
+        .blinky {
+            background-color: red;
+        }
+
+        .pinky {
+            background-color: pink;
+        }
+
+        .inky {
+            background-color: cyan;
+        }
+
+        .clyde {
+            background-color: orange;
+        }
+
+        .pac-man {
+            background-color: yellow;
+            border-radius: 10px;
+        }
+
+        .scared-ghost {
+            background-color: aquamarine;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid"></div>
+    <h3>Score:<span id="score"></span></h3>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const scoreDisplay = document.getElementById("score")
+    const width = 28
+    let score = 0
+    const grid = document.querySelector(".grid")
+
+    const layout = [
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+        1, 3, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 3, 1,
+        1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+        1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 4, 1, 1, 1, 2, 2, 1, 1, 1, 4, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 4, 1, 2, 2, 2, 2, 2, 2, 1, 4, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        4, 4, 4, 4, 4, 4, 0, 0, 0, 4, 1, 2, 2, 2, 2, 2, 2, 1, 4, 0, 0, 0, 4, 4, 4, 4, 4, 4,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 4, 1, 2, 2, 2, 2, 2, 2, 1, 4, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 0, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+        1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+        1, 3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 1,
+        1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1,
+        1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1,
+        1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+        1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    ]
+
+    // 0 - pac-dots
+    // 1 - wall
+    // 2 - ghost-lair
+    // 3 - power-pellet
+    // 4 - empty
+
+    const squares = []
+
+    //create your board
+    function createBoard() {
+        for (let i = 0; i < layout.length; i++) {
+            const square = document.createElement("div")
+            square.id = i
+            grid.appendChild(square)
+            squares.push(square)
+
+            //add layout to the board
+            if (layout[i] === 0) {
+                squares[i].classList.add("pac-dot")
+            }
+            if (layout[i] === 1) {
+                squares[i].classList.add("wall")
+            }
+            if (layout[i] === 2) {
+                squares[i].classList.add("ghost-lair")
+            }
+            if (layout[i] === 3) {
+                squares[i].classList.add("power-pellet")
+            }
+        }
+    }
+    createBoard()
+
+    //create Characters
+    // draw pac-man onto the board
+    let pacmanCurrentIndex = 490
+    squares[pacmanCurrentIndex].classList.add("pac-man")
+
+    //move pacman
+    function movePacman(e) {
+        squares[pacmanCurrentIndex].classList.remove("pac-man")
+        // switch (e.keyCode) { deprecated
+        switch (e.key) {
+            // case 37:
+            case "ArrowLeft":
+                if (
+                    pacmanCurrentIndex % width !== 0 &&
+                    !squares[pacmanCurrentIndex - 1].classList.contains("wall") &&
+                    !squares[pacmanCurrentIndex - 1].classList.contains("ghost-lair")
+                ) {
+                    pacmanCurrentIndex -= 1
+                }
+                if ((pacmanCurrentIndex - 1) === 363) {
+                    pacmanCurrentIndex = 391
+                }
+                break
+            case "ArrowUp":
+                // case 38:
+                if (
+                    pacmanCurrentIndex - width >= 0 &&
+                    !squares[pacmanCurrentIndex - width].classList.contains("wall") &&
+                    !squares[pacmanCurrentIndex - width].classList.contains("ghost-lair")
+
+                ) {
+                    pacmanCurrentIndex -= width
+                }
+                break
+            case "ArrowRight":
+                // case 39:
+                if (
+                    pacmanCurrentIndex % width < width - 1 &&
+                    !squares[pacmanCurrentIndex + 1].classList.contains("wall") &&
+                    !squares[pacmanCurrentIndex + 1].classList.contains("ghost-lair")
+                ) {
+                    pacmanCurrentIndex += 1
+                }
+                if (
+                    (pacmanCurrentIndex + 1) === 392
+                ) {
+                    pacmanCurrentIndex = 364
+                }
+                break
+            case "ArrowDown":
+                // case 40:
+                if (
+                    pacmanCurrentIndex + width < width * width &&
+                    !squares[pacmanCurrentIndex + width].classList.contains("wall") &&
+                    !squares[pacmanCurrentIndex + width].classList.contains("ghost-lair")
+                ) {
+                    pacmanCurrentIndex += width
+                }
+                break
+        }
+        squares[pacmanCurrentIndex].classList.add("pac-man")
+        pacDotEaten()
+        powerPelletEaten()
+        checkForGameOver()
+        checkForWin()
+    }
+
+    document.addEventListener("keyup", movePacman)
+
+    //what happens when you eat a pac-dot
+    function pacDotEaten() {
+        if (squares[pacmanCurrentIndex].classList.contains("pac-dot")) {
+            score++
+            scoreDisplay.innerHTML = score
+            squares[pacmanCurrentIndex].classList.remove("pac-dot")
+        }
+    }
+
+    //what happens when you eat a power-pellet
+    function powerPelletEaten() {
+        if (squares[pacmanCurrentIndex].classList.contains("power-pellet")) {
+            score += 10
+            scoreDisplay.innerHTML = score
+            ghosts.forEach(ghost => ghost.isScared = true)
+            setTimeout(unScareGhosts, 10000)
+            squares[pacmanCurrentIndex].classList.remove("power-pellet")
+        }
+    }
+
+    //make the ghosts stop flashing
+    function unScareGhosts() {
+        ghosts.forEach(ghost => ghost.isScared = false)
+    }
+
+    //create ghosts using Constructor
+    class Ghost {
+        constructor(className, startIndex, speed) {
+            this.className = className
+            this.startIndex = startIndex
+            this.speed = speed
+            this.currentIndex = startIndex
+            this.isScared = false
+            this.timerId = NaN
+
+        }
+    }
+
+    //all my ghosts
+    const ghosts = [
+        new Ghost("blinky", 348, 250),
+        new Ghost("pinky", 376, 400),
+        new Ghost("inky", 351, 300),
+        new Ghost("clyde", 379, 500),
+    ]
+
+    //draw my ghosts onto the grid
+    ghosts.forEach(ghost =>
+        squares[ghost.currentIndex].classList.add(ghost.className, "ghost"))
+
+    //move ghosts randomly
+    ghosts.forEach(ghost => moveGhost(ghost))
+
+    function moveGhost(ghost) {
+        const directions = [-1, 1, width, -width]
+        let direction = directions[Math.floor(Math.random() * directions.length)]
+
+        ghost.timerId = setInterval(function () {
+            //if next square your ghost is going to go to does not have a ghost and does not have a wall
+            if (
+                !squares[ghost.currentIndex + direction].classList.contains("ghost") &&
+                !squares[ghost.currentIndex + direction].classList.contains("wall")
+            ) {
+                squares[ghost.currentIndex].classList.remove(ghost.className, "ghost", "scared-ghost")
+                ghost.currentIndex += direction
+                squares[ghost.currentIndex].classList.add(ghost.className, "ghost")
+                // else find a new random direction to go in
+            } else direction = directions[Math.floor(Math.random() * directions.length)]
+            // if the ghost is currently scared
+            if (ghost.isScared) {
+                squares[ghost.currentIndex].classList.add("scared-ghost")
+            }
+
+            //if the ghost is currently scared and pacman is on it
+            if (ghost.isScared && squares[ghost.currentIndex].classList.contains("pac-man")) {
+                ghost.isScared = false
+                squares[ghost.currentIndex].classList.remove(ghost.className, "ghost", "scared-ghost")
+                ghost.currentIndex = ghost.startIndex
+                score += 100
+                scoreDisplay.innerHTML = score
+                squares[ghost.currentIndex].classList.add(ghost.className, "ghost")
+            }
+            checkForGameOver()
+        }, ghost.speed)
+    }
+
+    //check for a game over
+    function checkForGameOver() {
+        if (
+            squares[pacmanCurrentIndex].classList.contains("ghost") &&
+            !squares[pacmanCurrentIndex].classList.contains("scared-ghost")) {
+            ghosts.forEach(ghost => clearInterval(ghost.timerId))
+            document.removeEventListener("keyup", movePacman)
+            setTimeout(function () {
+                alert("Game Over")
+            }, 500)
+        }
+    }
+
+    //check for a win - change the winning score to whatever you wish
+    function checkForWin() {
+        if (score >= 274) {
+            ghosts.forEach(ghost => clearInterval(ghost.timerId))
+            document.removeEventListener("keyup", movePacman)
+            setTimeout(function () {
+                alert("You have WON!")
+            }, 500)
+        }
+    }
+})
+    </script>
+</body>
+</html>
