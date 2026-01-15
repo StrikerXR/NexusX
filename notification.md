@@ -1,6 +1,12 @@
-## NexusXOS 12.2 | The Phoenix Update
+## NexusXOS 12 LTS
 
-This update focuses on a major UI overhaul, significant performance improvements, and the introduction of powerful new features.
+**Long-Term Support:** This version will receive security patches and minor fixes until **January 21st, 2026**. No new features will be added during this period.
+
+---
+
+### Previous Update: 12.2 | The Phoenix Update
+
+This update focused on a major UI overhaul, significant performance improvements, and the introduction of powerful new features.
 
 ---
 
