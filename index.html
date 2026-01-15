@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusOS 12.2</title>
+    <title>NexusXOS 13 RC</title>
     <link id="favicon" rel="icon" href="https://www.google.com/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
@@ -173,31 +173,64 @@
         .tray-item:hover { transform: scale(1.1); background: rgba(125,125,125,0.2); }
         .clock { padding: 0 20px; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 80px; }
 
-        /* --- NOTIFICATION CENTER --- */
-        #notification-center {
-            position: absolute; top: 60px; right: 0; width: 380px; max-height: 500px;
-            background: var(--card-bg); border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); border-radius: 24px;
-            transform-origin: top right; transform: scale(0.5) translateY(-50px); 
-            opacity: 0; pointer-events: none; transition: 0.5s var(--fluid); z-index: 2000;
-            display: flex; flex-direction: column; overflow: hidden;
+        /* --- NOTIFICATION CENTER & WIDGETS --- */
+        #widget-container {
+            position: absolute;
+            top: 80px;
+            right: 40px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-end;
         }
-        #notification-center.active { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
-        
-        .nc-header {
-            padding: 15px 20px; border-bottom: 1px solid var(--glass-border);
-            display: flex; justify-content: space-between; align-items: center;
+
+        .widget {
+            width: 380px;
+            max-height: 500px;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-radius: 24px;
+            transform-origin: top right;
+            transform: scale(0.95) translateY(-10px) translateX(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.4s var(--fluid);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .widget.active {
+            transform: scale(1) translateY(0) translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .widget-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: rgba(125,125,125,0.05);
         }
-        .nc-title { font-weight: 700; font-size: 0.95rem; }
-        
-        .nc-body { 
-            padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .nc-body::-webkit-scrollbar { display: none; }
+        .widget-title { font-weight: 700; font-size: 0.95rem; }
 
+        .widget-body {
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .widget-body::-webkit-scrollbar { display: none; }
+
+        /* Notification Specific */
         .notif-card {
             background: rgba(125,125,125,0.05); border: 1px solid var(--glass-border);
             border-radius: 16px; padding: 20px; font-size: 0.9rem; line-height: 1.5;
@@ -219,42 +252,66 @@
         .notif-card ul { list-style: none; margin-left: 5px; margin-bottom: 15px; }
         .notif-card li { margin-bottom: 8px; position: relative; padding-left: 20px; }
         .notif-card li::before { content: '•'; color: var(--accent); position: absolute; left: 0; top: 0; }
-        
-        /* System Alerts in NC */
         .sys-alert { border-left: 4px solid var(--accent); background: var(--accent-glow); color: white; }
 
-        /* --- TODO & ALARMS --- */
-        #todo-widget {
-            position: absolute; top: 60px; right: 0; width: 340px; background: var(--card-bg);
-            border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-radius: 20px; padding: 20px;
-            transform-origin: top right; transform: scale(0.5) translateY(-50px); opacity: 0; pointer-events: none; transition: 0.5s var(--fluid); z-index: 2000;
-        }
-        #todo-widget.active { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
-        
-        .todo-input-group { display: flex; gap: 8px; margin-bottom: 15px; }
-        .todo-input { flex: 1; background: rgba(125,125,125,0.1); border: none; padding: 8px 12px; border-radius: 8px; color: var(--text-main); font-size: 0.9rem; }
-        /* Time Input */
-        .time-input { width: 90px; background: rgba(125,125,125,0.1); border: none; padding: 8px; border-radius: 8px; color: var(--text-dim); font-size: 0.8rem; cursor: pointer; }
-        .time-input::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.5); cursor: pointer; }
+        /* To-Do Specific */
+        #todo-widget { width: 340px; }
+        #todo-widget .widget-body { padding: 20px; }
 
-        .todo-list { list-style: none; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .todo-item { 
-            display: flex; align-items: center; padding: 12px; background: rgba(125,125,125,0.05); 
-            border-radius: 12px; border: 1px solid transparent; transition: 0.2s; 
+        .todo-input-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .todo-input-group input {
+            background: rgba(125,125,125,0.1); border: none;
+            padding: 10px 14px; border-radius: 12px;
+            color: var(--text-main); font-size: 0.9rem;
         }
-        .todo-item:hover { background: rgba(125,125,125,0.1); }
-        .todo-item.overdue { border-color: #ef4444; }
-        
-        .todo-marker { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+        .todo-input-group input[type=text] { flex: 1; }
+        .todo-input-group input[type=time] {
+            width: 100px; color: var(--text-dim); cursor: pointer;
+        }
+        .todo-input-group input[type=time]::-webkit-calendar-picker-indicator {
+            filter: invert(1) opacity(0.5); cursor: pointer;
+        }
+        #add-todo-btn {
+            width: 44px; height: 44px; padding: 0;
+            flex-shrink: 0;
+        }
+
+        #todo-list { list-style: none; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .todo-item {
+            display: flex; align-items: center; padding: 12px; background: rgba(125,125,125,0.05);
+            border-radius: 12px; border: 1px solid transparent; transition: 0.3s;
+            transform: scale(1);
+        }
+        .todo-item:hover { background: rgba(125,125,125,0.1); border-color: var(--glass-border); }
+
+        .todo-item.done {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .todo-item.done .todo-text { color: var(--text-dim); }
+
+        .todo-marker {
+            width: 20px; height: 20px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;
+            border: 2px solid var(--accent); cursor: pointer;
+            transition: 0.3s;
+        }
+        .todo-item.done .todo-marker { background: var(--accent); border-color: var(--accent); }
+
         .todo-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .todo-text {
             font-size: 0.9rem; color: var(--text-main);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            transition: color 0.3s;
         }
         .todo-time { font-size: 0.7rem; color: var(--accent); margin-top: 2px; }
-        
-        .todo-del { color: #ef4444; cursor: pointer; opacity: 0.6; padding: 5px; } 
-        .todo-del:hover { opacity: 1; transform: scale(1.2); }
+
+        .todo-del {
+            color: var(--text-dim); cursor: pointer; opacity: 0; padding: 5px;
+            transition: 0.3s;
+        }
+        .todo-item:hover .todo-del { opacity: 0.7; }
+        .todo-del:hover { opacity: 1; color: #ef4444; transform: scale(1.2); }
+        .todo-empty { text-align: center; color: var(--text-dim); padding: 20px; font-size: 0.9rem; }
 
         /* --- VIEWPORT --- */
         .view-container { flex: 1; position: relative; width: 100%; display: flex; overflow: hidden; }
@@ -403,13 +460,21 @@
         /* --- FLOATING MUSIC WINDOW --- */
         #music-window {
             position: absolute; top: 50%; left: 50%; width: 950px; height: 650px;
-            transform: translate(-50%, -50%) scale(0.9); opacity: 0; pointer-events: none;
+            --scale: 0.9;
+            --drag-x: 0px;
+            --drag-y: 0px;
+            transform: translate(-50%, -50%) translate(var(--drag-x), var(--drag-y)) scale(var(--scale));
+            opacity: 0; pointer-events: none;
             background: #000; border-radius: 30px; overflow: hidden;
             box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,59,59,0.2);
             z-index: 9999; display: flex; flex-direction: column; resize: both; min-width: 600px; min-height: 400px;
             transition: opacity 0.4s ease, transform 0.4s var(--fluid);
         }
-        #music-window.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        #music-window.active {
+            opacity: 1;
+            --scale: 1;
+            pointer-events: auto;
+        }
         
         /* When dragging, remove transition to prevent lag */
         #music-window.dragging { transition: none; }
@@ -433,7 +498,7 @@
     <!-- OOBE LAYER (Pill UI) -->
     <div id="oobe-overlay">
         <div class="pill-container">
-            <div class="pill-header">NexusOS 12.2</div>
+            <div class="pill-header">NexusXOS 13 RC</div>
             <div class="pill-desc">Select a Tab Cloak to begin your session.</div>
             
             <!-- In-Pill Spoof Grid -->
@@ -501,45 +566,50 @@
     <div id="main-interface">
         <div class="top-bar">
             <div class="nav-pill">
-                <div class="nav-item active" onclick="View.set('games')">Library</div>
-                <div class="nav-item" onclick="View.set('settings')">Settings</div>
+                <div class="nav-item active" data-view="games">Library</div>
+                <div class="nav-item" data-view="settings">Settings</div>
             </div>
             <div class="system-tray">
-                <div class="clock tray-item" id="clock" onclick="Todo.toggle()"></div>
-                
-                <!-- MUSIC PLAYER ICON -->
-                <div class="tray-item icon-btn" onclick="MusicApp.toggle()" style="width:44px; padding:0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="18" r="4"/><path d="M12 18V2l7 4"/></svg>
-                </div>
+                <div class="clock tray-item" id="clock"></div>
 
-                <!-- NOTIFICATION ICON -->
-                <div class="tray-item icon-btn" onclick="Notifications.toggle()" style="width:44px; padding:0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                <!-- ICONS -->
+                <div class="tray-item icon-btn" data-action="toggle-music">
+                    <i data-lucide="music"></i>
                 </div>
-
-                <div class="tray-item icon-btn" onclick="Utils.toggleFull()" style="width:44px; padding:0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                <div class="tray-item icon-btn" data-action="toggle-notifications">
+                    <i data-lucide="bell"></i>
                 </div>
-
-                <!-- NOTIFICATION CENTER -->
-                <div id="notification-center">
-                    <div class="nc-header">
-                        <span class="nc-title">Notifications</span>
-                        <button class="btn btn-ghost" style="padding:4px 10px; font-size:0.75rem;" onclick="Notifications.reload()">Refresh</button>
-                    </div>
-                    <div class="nc-body" id="notif-content">
-                        <div class="notif-loading">Loading Updates...</div>
-                    </div>
+                <div class="tray-item icon-btn" data-action="toggle-fullscreen">
+                    <i data-lucide="maximize"></i>
                 </div>
+            </div>
+        </div>
 
-                <!-- TODO WIDGET -->
-                <div id="todo-widget">
+        <!-- POP-UP WIDGETS -->
+        <div id="widget-container">
+            <!-- NOTIFICATION CENTER -->
+            <div id="notification-center" class="widget">
+                <div class="widget-header">
+                    <span class="widget-title">Notifications</span>
+                    <button class="btn btn-ghost" data-action="reload-notifications">Refresh</button>
+                </div>
+                <div class="widget-body" id="notif-content">
+                    <div class="notif-loading">Loading Updates...</div>
+                </div>
+            </div>
+
+            <!-- TODO WIDGET (Refactored) -->
+            <div id="todo-widget" class="widget">
+                <div class="widget-header">
+                    <span class="widget-title">To-Do List</span>
+                </div>
+                <div class="widget-body">
                     <div class="todo-input-group">
-                        <input type="text" class="todo-input" id="todo-input" placeholder="Task..." onkeypress="Todo.handleInput(event)">
-                        <input type="time" class="time-input" id="todo-time" title="Set Alarm">
-                        <button class="btn btn-primary" style="padding:0 12px;" onclick="Todo.add()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                        <input type="text" id="todo-input" placeholder="Add a task...">
+                        <input type="time" id="todo-time" title="Set a reminder time">
+                        <button id="add-todo-btn" class="btn-primary"><i data-lucide="plus"></i></button>
                     </div>
-                    <ul class="todo-list" id="todo-list"></ul>
+                    <ul id="todo-list"></ul>
                 </div>
             </div>
         </div>
@@ -631,567 +701,166 @@
     </div>
 
     <script>
-/* --- MUSIC PLAYER CODE (Injected to prevent CSS conflicts) --- */
-const musicPlayerHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"><\/script>
-    <style>
-        :root {
-            --bg-oled: #050505;
-            --accent-red: #ff3333;
-            --accent-glow: rgba(255, 51, 51, 0.4);
-            --glass: rgba(20, 20, 20, 0.7);
-            --border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, system-ui, sans-serif; user-select: none; }
-        body { background-color: var(--bg-oled); color: var(--text); height: 100vh; width: 100vw; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        
-        .ambient-glow { 
-            position: absolute; width: 100vw; height: 100vh; 
-            background: radial-gradient(circle at 50% 50%, rgba(255, 51, 51, 0.08) 0%, transparent 70%); 
-            z-index: 0; pointer-events: none; 
-        }
-        
-        .nexus-shell {
-            width: 100%; height: 100%;
-            background: var(--glass);
-            backdrop-filter: blur(60px) saturate(160%);
-            -webkit-backdrop-filter: blur(60px) saturate(160%);
-            display: flex; overflow: hidden; position: relative; z-index: 10;
-        }
-
-        .zone-left { flex: 1.1; padding: 40px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--border); }
-        .zone-right { flex: 0.9; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
-        
-        .art-wrapper { 
-            width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; 
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8); position: relative; 
-            border: 1px solid var(--border); background: #000;
-        }
-        
-        #cover-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        #video-element { width: 100%; height: 100%; object-fit: contain; display: none; }
-
-        .track-info { margin-top: 25px; }
-        .track-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-artist { font-size: 1rem; color: var(--accent-red); font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
-        
-        .controls-stack { margin-top: auto; display: flex; flex-direction: column; gap: 20px; }
-        
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 20px; cursor: pointer; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--accent-red); margin-top: -5px; box-shadow: 0 0 12px var(--accent-glow); transition: 0.2s; }
-        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.3); }
-        
-        .time-display { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); font-family: 'Monaco', monospace; margin-top: 6px; }
-        
-        .main-buttons { display: flex; justify-content: center; align-items: center; gap: 35px; }
-        .btn { background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; transition: 0.3s; opacity: 0.8; }
-        .btn:hover { color: var(--accent-red); opacity: 1; transform: scale(1.1); }
-        .btn-play { width: 65px; height: 65px; border-radius: 50%; background: var(--accent-red); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; opacity: 1; box-shadow: 0 10px 25px var(--accent-glow); }
-        
-        .bass-module { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 18px; border: 1px solid var(--border); }
-        .bass-header { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; color: var(--text-dim); }
-        
-        .header-bar { padding: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .brand { font-weight: 900; letter-spacing: 3px; font-size: 1.1rem; }
-        .brand span { color: var(--accent-red); }
-        
-        .file-upload-label { background: var(--accent-red); color: white; padding: 10px 22px; border-radius: 30px; font-size: 0.75rem; cursor: pointer; transition: 0.3s; font-weight: 700; box-shadow: 0 5px 15px var(--accent-glow); }
-        .file-upload-label:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        #file-input { display: none; }
-        
-        #visualizer { width: 100%; height: 100%; flex: 1; }
-    </style>
-</head>
-<body>
-    <div class="ambient-glow"></div>
-    <div class="nexus-shell">
-        <div class="zone-left">
-            <div class="art-wrapper">
-                <img id="cover-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-                <video id="video-element" crossorigin="anonymous" playsinline></video>
-            </div>
-            <div class="track-info">
-                <div id="title-display" class="track-title">NexusX Studio</div>
-                <div id="artist-display" class="track-artist">System Ready</div>
-            </div>
-            <div class="controls-stack">
-                <div class="main-buttons">
-                    <button class="btn" id="btn-prev"><i class="fas fa-backward"></i></button>
-                    <button class="btn btn-play" id="btn-play"><i class="fas fa-play"></i></button>
-                    <button class="btn" id="btn-next"><i class="fas fa-forward"></i></button>
-                </div>
-                <div>
-                    <input type="range" id="seek-slider" value="0" max="1000">
-                    <div class="time-display"><span id="curr-time">0:00</span><span id="dur-time">0:00</span></div>
-                </div>
-                <div class="bass-module">
-                    <div class="bass-header"><span>Sub-Bass Enhancement</span><span id="bass-val" style="color:var(--accent-red)">0%</span></div>
-                    <input type="range" id="bass-slider" min="0" max="100" value="0">
-                </div>
-            </div>
-        </div>
-        <div class="zone-right">
-            <div class="header-bar">
-                <div class="brand">NEXUS<span>STUDIO</span></div>
-                <label for="file-input" class="file-upload-label"><i class="fas fa-plus"></i> ADD MEDIA</label>
-                <input type="file" id="file-input" accept="audio/*, video/*">
-            </div>
-            <canvas id="visualizer"></canvas>
-        </div>
-    </div>
-
-    <script>
-        class NexusPlayer {
+        class NexusApp {
             constructor() {
-                this.audioEl = new Audio();
-                this.videoEl = document.getElementById('video-element');
-                this.activeMedia = this.audioEl;
-                
-                this.audioCtx = null;
-                this.nodes = {}; // Store audio nodes
-                
-                this.ui = {
-                    playBtn: document.getElementById('btn-play'),
-                    playIcon: document.querySelector('#btn-play i'),
-                    seek: document.getElementById('seek-slider'),
-                    bass: document.getElementById('bass-slider'),
-                    bassVal: document.getElementById('bass-val'),
-                    currTime: document.getElementById('curr-time'),
-                    durTime: document.getElementById('dur-time'),
-                    fileIn: document.getElementById('file-input'),
-                    title: document.getElementById('title-display'),
-                    artist: document.getElementById('artist-display'),
-                    cover: document.getElementById('cover-img'),
-                    canvas: document.getElementById('visualizer')
-                };
-                
-                this.ctx = this.ui.canvas.getContext('2d', { alpha: false });
-                this.setupEvents();
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-            }
-
-            initAudioEngine() {
-                if (this.audioCtx) return;
-
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                this.audioCtx = new AudioContext({ latencyHint: 'playback' });
-
-                // Create Nodes
-                this.nodes.audioSrc = this.audioCtx.createMediaElementSource(this.audioEl);
-                this.nodes.videoSrc = this.audioCtx.createMediaElementSource(this.videoEl);
-                
-                // Bass Chain: LowShelf (Sub) + Peaking (Punch)
-                this.nodes.bassShelf = this.audioCtx.createBiquadFilter();
-                this.nodes.bassShelf.type = 'lowshelf';
-                this.nodes.bassShelf.frequency.value = 100;
-
-                this.nodes.bassPunch = this.audioCtx.createBiquadFilter();
-                this.nodes.bassPunch.type = 'peaking';
-                this.nodes.bassPunch.frequency.value = 60;
-                this.nodes.bassPunch.Q.value = 1.5;
-
-                // Audio Quality: Dynamics Compressor (Makes sound "thick" and prevents distortion)
-                this.nodes.compressor = this.audioCtx.createDynamicsCompressor();
-                this.nodes.compressor.threshold.setValueAtTime(-24, this.audioCtx.currentTime);
-                this.nodes.compressor.knee.setValueAtTime(30, this.audioCtx.currentTime);
-                this.nodes.compressor.ratio.setValueAtTime(3, this.audioCtx.currentTime);
-                this.nodes.compressor.attack.setValueAtTime(0.003, this.audioCtx.currentTime);
-                this.nodes.compressor.release.setValueAtTime(0.25, this.audioCtx.currentTime);
-
-                this.nodes.analyser = this.audioCtx.createAnalyser();
-                this.nodes.analyser.fftSize = 512;
-                this.nodes.analyser.smoothingTimeConstant = 0.8;
-
-                // Final Connection Chain
-                this.nodes.bassShelf.connect(this.nodes.bassPunch);
-                this.nodes.bassPunch.connect(this.nodes.compressor);
-                this.nodes.compressor.connect(this.nodes.analyser);
-                this.nodes.analyser.connect(this.audioCtx.destination);
-
-                this.routeSource();
-                this.draw();
-            }
-
-            routeSource() {
-                this.nodes.audioSrc.disconnect();
-                this.nodes.videoSrc.disconnect();
-                const currentSource = (this.activeMedia === this.videoEl) ? this.nodes.videoSrc : this.nodes.audioSrc;
-                currentSource.connect(this.nodes.bassShelf);
-            }
-
-            setupEvents() {
-                this.ui.playBtn.onclick = () => this.toggle();
-                this.ui.fileIn.onchange = (e) => this.load(e.target.files[0]);
-                
-                this.ui.seek.oninput = (e) => {
-                    const time = (e.target.value / 1000) * this.activeMedia.duration;
-                    this.activeMedia.currentTime = time;
+                this.state = {
+                    version: "13 RC",
+                    oobeKey: "nx_oobe_v13",
+                    settings: this.loadSettings(),
+                    lastNotif: null,
                 };
 
-                this.ui.bass.oninput = (e) => {
-                    const val = e.target.value;
-                    this.ui.bassVal.innerText = \`\${val}%\`;
-                    if (this.nodes.bassShelf) {
-                        // Max 15dB boost distributed over two filters for high quality
-                        this.nodes.bassShelf.gain.setTargetAtTime(val * 0.12, this.audioCtx.currentTime, 0.1);
-                        this.nodes.bassPunch.gain.setTargetAtTime(val * 0.08, this.audioCtx.currentTime, 0.1);
-                    }
+                this.constants = {
+                    defaultGames: [
+                        { title: "Froggies Arcade", url: "https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/", image: "https://images.unsplash.com/photo-1590005176489-db2e714711fc?q=80&w=1000", isNew: true },
+                        { title: "GNMath V2", url: "https://ormsescaperoad.w3spaces.com/gnmath.html", image: "https://images.unsplash.com/photo-1648700231913-ad061d9b3ec9?w=1920", isNew: true },
+                        { title: "BitLife", url: "https://ormsescaperoad.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=80&w=1000&auto=format&fit=crop", isNew: true },
+                        { title: "Snow Rider 3D", url: "https://ormsescaperoad.w3spaces.com/snow.html", image: "https://plus.unsplash.com/premium_photo-1719930221794-0680e7fd8071", isNew: true },
+                        { title: "Oregon Trail", url: "https://oregontrail.ws/the-oregon-trail-game/", image: "https://images.unsplash.com/photo-1533167649158-6d508895b680?q=80&w=1000", isNew: true },
+                        { title: "Mesh", url: "https://me.meshcapade.com/editor", image: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1000", isNew: true },
+                        { title: "Willway", url: "https://admin.internetspeedtest.world/", image: "https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?q=80&w=1000", isNew: true },
+                        { title: "FC Games", url: "https://agreeable-mud-098a6b110.1.azurestaticapps.net/", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000", isNew: true },
+                        { title: "Silk", url: "https://ormsescaperoad.w3spaces.com/silk.html", image: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=1000" },
+                        { title: "Snake", url: "https://ormsescaperoad.w3spaces.com/snake.html", image: "https://images.unsplash.com/photo-1739869610059-86fabc7bcd7b?fit=clip&w=2500" },
+                        { title: "Tetris", url: "https://ormsescaperoad.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?w=1920"},
+                        { title: "Hex", url: "https://www.nddb.coop/ccnddb/games/Hexagon Twist/", image: "https://images.unsplash.com/vector-1761047846560-52720ea86a46?w=1920" },
+                        { title: "Dino Run", url: "https://ormsescaperoad.w3spaces.com/dino.html", image: "https://images.unsplash.com/vector-1761941086671-a623243d84a3?w=1920" },
+                        { title: "Flappy Bird", url: "https://ormsescaperoad.w3spaces.com/bird.html", image: "https://images.unsplash.com/photo-1732198246906-8168ef1ff6bc?q=80&w=1740" },
+                        { title: "Drive Mad", url: "https://ormsescaperoad.w3spaces.com/drive-mad.html", image: "https://images.unsplash.com/photo-1763897236977-1baa4a026a6d?q=80&w=2064" },
+                        { title: "Bank Heist", url: "https://ormsescaperoad.w3spaces.com/bank.html", image: "https://images.unsplash.com/photo-1738691035045-3fb009e8aa26?fit=clip&w=2500" },
+                        { title: "Slither.io", url: "https://ormsescaperoad.w3spaces.com/snakeio.html", image: "https://images.unsplash.com/photo-1736613403120-8d48aebd29e1?fit=clip&w=2500" },
+                        { title: "Escape Road", url: "https://ormsescaperoad.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=80&w=774" },
+                    ],
+                    spoofs: [
+                        { id: 'none', t: 'NexusXOS 13 RC', i: 'https://www.google.com/favicon.ico' },
+                        { id: 'google', t: 'Google', i: 'https://www.google.com/favicon.ico' },
+                        { id: 'canvas', t: 'Dashboard', i: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico' },
+                        { id: 'clever', t: 'Clever | Portal', i: 'https://assets.clever.com/favicon.ico' },
+                        { id: 'classroom', t: 'Classes', i: 'https://ssl.gstatic.com/classroom/favicon.png' },
+                        { id: 'drive', t: 'My Drive', i: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' },
+                        { id: 'gmail', t: 'Inbox', i: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico' },
+                        { id: 'zoom', t: 'Zoom Meeting', i: 'https://st1.zoom.us/zoom.ico' },
+                        { id: 'kahoot', t: 'Enter Game PIN!', i: 'https://kahoot.it/favicon.ico' },
+                        { id: 'quizlet', t: 'Quizlet', i: 'https://assets.quizlet.com/a/j/favicon-32x32.e762772.png' },
+                        { id: 'wikipedia', t: 'Wikipedia', i: 'https://en.wikipedia.org/static/favicon/wikipedia.ico' },
+                        { id: 'discord', t: 'Discord', i: 'https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png' },
+                        { id: 'spotify', t: 'Spotify - Web Player', i: 'https://open.spotifycdn.com/cdn/images/favicon32.b64ecc03.png' },
+                        { id: 'reddit', t: 'Reddit', i: 'https://www.redditstatic.com/desktopweb/img/favicon/favicon-32x32.png' },
+                        { id: 'twitter', t: 'X', i: 'https://abs.twimg.com/favicons/twitter.3.ico' }
+                    ]
                 };
 
-                const update = () => {
-                    if (!this.activeMedia.paused) {
-                        const p = (this.activeMedia.currentTime / this.activeMedia.duration) * 1000;
-                        this.ui.seek.value = p || 0;
-                        this.ui.currTime.innerText = this.format(this.activeMedia.currentTime);
-                        this.ui.durTime.innerText = this.format(this.activeMedia.duration);
-                    }
-                    requestAnimationFrame(update);
-                };
-                update();
-            }
-
-            async load(file) {
-                if (!file) return;
-                this.initAudioEngine();
-                
-                if (this.activeMedia.src) URL.revokeObjectURL(this.activeMedia.src);
-                const url = URL.createObjectURL(file);
-                
-                const isVideo = file.type.startsWith('video');
-                this.activeMedia = isVideo ? this.videoEl : this.audioEl;
-                
-                // Switch Visibility
-                this.videoEl.style.display = isVideo ? 'block' : 'none';
-                this.ui.cover.style.display = isVideo ? 'none' : 'block';
-                
-                this.audioEl.pause();
-                this.videoEl.pause();
-                this.activeMedia.src = url;
-                this.routeSource();
-                
-                this.ui.title.innerText = file.name;
-                this.ui.artist.innerText = isVideo ? "Video Media" : "Loading Tags...";
-                
-                if (!isVideo) this.getTags(file);
-                
-                this.activeMedia.play().then(() => {
-                    this.ui.playIcon.className = 'fas fa-pause';
-                });
-            }
-
-            getTags(file) {
-                if (window.jsmediatags) {
-                    window.jsmediatags.read(file, {
-                        onSuccess: (tag) => {
-                            this.ui.title.innerText = tag.tags.title || file.name;
-                            this.ui.artist.innerText = tag.tags.artist || "Unknown Artist";
-                            if (tag.tags.picture) {
-                                const { data, format } = tag.tags.picture;
-                                let base64 = "";
-                                for (let i = 0; i < data.length; i++) base64 += String.fromCharCode(data[i]);
-                                this.ui.cover.src = \`data:\${format};base64,\${btoa(base64)}\`;
-                            }
-                        },
-                        onError: () => { this.ui.artist.innerText = "Local Audio"; }
+                this.ui = new UIManager(this);
+                this.clock = new Clock(this);
+                this.todo = new Todo(this);
+                this.notifications = new Notifications(this);
+                this.games = new Games(this);
+                this.settings = new Settings(this);
+                this.music = new MusicApp(this);
+                this.modals = new Modals(this);
+                this.addGame = new AddGame(this);
+                this.oobe = new OOBE(this);
+        class UIManager {
+            // ... UIManager methods
+            populateSpoofGrids() {
+                const grids = [
+                    document.getElementById('oobe-spoof-grid'),
+                    document.getElementById('settings-spoof-grid')
+                ];
+                grids.forEach(grid => {
+                    if (!grid) return;
+                    grid.innerHTML = '';
+                    this.app.constants.spoofs.forEach(s => {
+                        let d = document.createElement('div');
+                        d.className = "spoof-item";
+                        d.dataset.id = s.id;
+                        d.innerHTML = `<img src="${s.i}" class="spoof-icon"><div class="spoof-name">${s.t}</div>`;
+                        d.onclick = () => this.app.settings.setCloak(s.id);
+                        grid.appendChild(d);
                     });
-                }
-            }
-
-            toggle() {
-                this.initAudioEngine();
-                if (this.activeMedia.paused) {
-                    this.activeMedia.play();
-                    this.ui.playIcon.className = 'fas fa-pause';
-                } else {
-                    this.activeMedia.pause();
-                    this.ui.playIcon.className = 'fas fa-play';
-                }
-            }
-
-            format(s) {
-                if (isNaN(s)) return "0:00";
-                const m = Math.floor(s / 60);
-                const sec = Math.floor(s % 60);
-                return \`\${m}:\${sec < 10 ? '0' + sec : sec}\`;
-            }
-
-            resize() {
-                this.ui.canvas.width = this.ui.canvas.offsetWidth * window.devicePixelRatio;
-                this.ui.canvas.height = this.ui.canvas.offsetHeight * window.devicePixelRatio;
-            }
-
-            draw() {
-                requestAnimationFrame(() => this.draw());
-                const data = new Uint8Array(this.nodes.analyser.frequencyBinCount);
-                this.nodes.analyser.getByteFrequencyData(data);
-
-                const w = this.ui.canvas.width;
-                const h = this.ui.canvas.height;
-                this.ctx.fillStyle = '#050505';
-                this.ctx.fillRect(0, 0, w, h);
-
-                const barWidth = (w / data.length) * 2.5;
-                let x = 0;
-
-                for (let i = 0; i < data.length; i++) {
-                    const barHeight = (data[i] / 255) * h * 0.8;
-                    const r = 255;
-                    const g = 51;
-                    const b = 51;
-
-                    this.ctx.fillStyle = \`rgba(\${r}, \${g}, \${b}, \${data[i] / 255})\`;
-                    this.ctx.shadowBlur = 15;
-                    this.ctx.shadowColor = 'rgba(255, 51, 51, 0.5)';
-                    
-                    // Rounded top bars
-                    this.ctx.beginPath();
-                    this.ctx.roundRect(x, h - barHeight, barWidth - 4, barHeight, [10, 10, 0, 0]);
-                    this.ctx.fill();
-
-                    x += barWidth;
-                }
+                });
             }
         }
+        class Games {
+            constructor(app) {
+                this.app = app;
+                this.list = [];
+                this.dom = {
+                    track: document.getElementById('card-track'),
+                    heroText: document.getElementById('hero-text'),
+                    playBtn: document.getElementById('play-btn')
+                };
 
-        window.onload = () => new NexusPlayer();
-    <\/script>
-</body>
-</html>`;
-        /* --- STATE --- */
-        const State = {
-            version: "12.2",
-            oobeKey: "nx_oobe_v12.2",
-            settings: {
-                time24: localStorage.getItem('nx_time24') === 'true',
-                preventClose: localStorage.getItem('nx_prevent') === 'true',
-                cloak: localStorage.getItem('nx_cloak') || 'none',
-                bg: localStorage.getItem('nx_bg') || '',
-                todos: JSON.parse(localStorage.getItem('nx_todos') || '[]'),
-                lightMode: localStorage.getItem('nx_light') === 'true',
-                tilt: parseInt(localStorage.getItem('nx_tilt') || '500'),
-                customGames: JSON.parse(localStorage.getItem('nx_custom_games') || '[]')
+                document.querySelector('.scroll-arrow.left').onclick = () => this.scroll(-1);
+                document.querySelector('.scroll-arrow.right').onclick = () => this.scroll(1);
             }
-        };
 
-        const DefaultGames = [
-            { title: "Froggies Arcade", url: "https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/", image: "https://images.unsplash.com/photo-1590005176489-db2e714711fc?q=80&w=1000", isNew: true },
-            { title: "GNMath V2", url: "https://ormsescaperoad.w3spaces.com/gnmath.html", image: "https://images.unsplash.com/photo-1648700231913-ad061d9b3ec9?w=1920", isNew: true },
-            { title: "BitLife", url: "https://ormsescaperoad.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=80&w=1000&auto=format&fit=crop", isNew: true },
-            { title: "Snow Rider 3D", url: "https://ormsescaperoad.w3spaces.com/snow.html", image: "https://plus.unsplash.com/premium_photo-1719930221794-0680e7fd8071", isNew: true },
-            { title: "Oregon Trail", url: "https://oregontrail.ws/the-oregon-trail-game/", image: "https://images.unsplash.com/photo-1533167649158-6d508895b680?q=80&w=1000", isNew: true },
-            { title: "Mesh", url: "https://me.meshcapade.com/editor", image: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1000", isNew: true },
-            { title: "Willway", url: "https://admin.internetspeedtest.world/", image: "https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?q=80&w=1000", isNew: true },
-            { title: "FC Games", url: "https://agreeable-mud-098a6b110.1.azurestaticapps.net/", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000", isNew: true },
-            { title: "Silk", url: "https://ormsescaperoad.w3spaces.com/silk.html", image: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=1000" },
-            { title: "Snake", url: "https://ormsescaperoad.w3spaces.com/snake.html", image: "https://images.unsplash.com/photo-1739869610059-86fabc7bcd7b?fit=clip&w=2500" },
-            { title: "Tetris", url: "https://ormsescaperoad.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?w=1920"},
-            { title: "Hex", url: "https://www.nddb.coop/ccnddb/games/Hexagon Twist/", image: "https://images.unsplash.com/vector-1761047846560-52720ea86a46?w=1920" },
-            { title: "Dino Run", url: "https://ormsescaperoad.w3spaces.com/dino.html", image: "https://images.unsplash.com/vector-1761941086671-a623243d84a3?w=1920" },
-            { title: "Flappy Bird", url: "https://ormsescaperoad.w3spaces.com/bird.html", image: "https://images.unsplash.com/photo-1732198246906-8168ef1ff6bc?q=80&w=1740" },
-            { title: "Drive Mad", url: "https://ormsescaperoad.w3spaces.com/drive-mad.html", image: "https://images.unsplash.com/photo-1763897236977-1baa4a026a6d?q=80&w=2064" },
-            { title: "Bank Heist", url: "https://ormsescaperoad.w3spaces.com/bank.html", image: "https://images.unsplash.com/photo-1738691035045-3fb009e8aa26?fit=clip&w=2500" },
-            { title: "Slither.io", url: "https://ormsescaperoad.w3spaces.com/snakeio.html", image: "https://images.unsplash.com/photo-1736613403120-8d48aebd29e1?fit=clip&w=2500" },
-            { title: "Escape Road", url: "https://ormsescaperoad.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=80&w=774" }, 
-        ];
-
-        const Spoofs = [
-            { id: 'none', t: 'NexusOS 12.2', i: 'https://www.google.com/favicon.ico' },
-            { id: 'google', t: 'Google', i: 'https://www.google.com/favicon.ico' },
-            { id: 'canvas', t: 'Dashboard', i: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico' },
-            { id: 'clever', t: 'Clever | Portal', i: 'https://assets.clever.com/favicon.ico' },
-            { id: 'classroom', t: 'Classes', i: 'https://ssl.gstatic.com/classroom/favicon.png' },
-            { id: 'drive', t: 'My Drive', i: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' },
-            { id: 'gmail', t: 'Inbox', i: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico' },
-            { id: 'zoom', t: 'Zoom Meeting', i: 'https://st1.zoom.us/zoom.ico' },
-            { id: 'kahoot', t: 'Enter Game PIN!', i: 'https://kahoot.it/favicon.ico' },
-            { id: 'quizlet', t: 'Quizlet', i: 'https://assets.quizlet.com/a/j/favicon-32x32.e762772.png' },
-            { id: 'wikipedia', t: 'Wikipedia', i: 'https://en.wikipedia.org/static/favicon/wikipedia.ico' },
-            { id: 'discord', t: 'Discord', i: 'https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png' },
-            { id: 'spotify', t: 'Spotify - Web Player', i: 'https://open.spotifycdn.com/cdn/images/favicon32.b64ecc03.png' },
-            { id: 'reddit', t: 'Reddit', i: 'https://www.redditstatic.com/desktopweb/img/favicon/favicon-32x32.png' },
-            { id: 'twitter', t: 'X', i: 'https://abs.twimg.com/favicons/twitter.3.ico' }
-        ];
-
-        /* --- LOGIC --- */
-        const Utils = {
-            toggleFull: () => !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen(),
-            openBlank: () => {
-                let win = window.open();
-                win.document.body.style.margin="0"; win.document.body.style.height="100vh";
-                let iframe = win.document.createElement('iframe');
-                iframe.style.cssText = "border:none; width:100%; height:100%;";
-                iframe.src = window.location.href;
-                win.document.body.appendChild(iframe);
-            },
-            getBase64: (file) => new Promise((res, rej) => {
-                const r = new FileReader(); r.readAsDataURL(file);
-                r.onload=()=>res(r.result); r.onerror=e=>rej(e);
-            })
-        };
-
-        const MusicApp = {
-            loaded: false,
-            init: () => {
-                if(MusicApp.loaded) return;
-                const iframe = document.getElementById('music-frame');
-                iframe.srcdoc = musicPlayerHTML;
-                MusicApp.initDraggable();
-                MusicApp.loaded = true;
-            },
-            toggle: () => {
-                const win = document.getElementById('music-window');
-                const isActive = win.classList.toggle('active');
-                if(isActive) MusicApp.init();
-            },
-            initDraggable: () => {
-                const win = document.getElementById('music-window');
-                const header = document.getElementById('mw-header');
-                let isDragging = false;
-                let startX, startY, initialLeft, initialTop;
-
-                header.addEventListener('mousedown', (e) => {
-                    isDragging = true;
-                    win.classList.add('dragging');
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    const rect = win.getBoundingClientRect();
-                    // Store offset relative to viewport
-                    initialLeft = rect.left;
-                    initialTop = rect.top;
-                    
-                    // Remove translate(-50%, -50%) for absolute positioning logic once moved
-                    win.style.transform = 'none'; 
-                    win.style.left = initialLeft + 'px';
-                    win.style.top = initialTop + 'px';
-                });
-
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
-                    win.style.left = `${initialLeft + dx}px`;
-                    win.style.top = `${initialTop + dy}px`;
-                });
-
-                document.addEventListener('mouseup', () => {
-                    isDragging = false;
-                    win.classList.remove('dragging');
-                });
-            }
-        };
-
-const Notifications = {
-            loaded: false,
-            toggle: () => {
-                const el = document.getElementById('notification-center');
-                const isActive = el.classList.toggle('active');
-                if(isActive && !Notifications.loaded) Notifications.reload();
-                if(isActive) document.getElementById('todo-widget').classList.remove('active');
-            },
-            reload: () => {
-                const content = document.getElementById('notif-content');
-                content.innerHTML = '<div class="notif-loading">Checking for updates...</div>';
+            render() {
+                this.dom.track.innerHTML = "";
+                this.list = [...this.app.constants.defaultGames, ...this.app.state.settings.customGames];
                 
-                // Using AllOrigins Proxy to bypass CORS restrictions
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                const targetUrl = 'https://pastebin.com/raw/6zCTDTmj';
-
-                fetch(proxyUrl + encodeURIComponent(targetUrl))
-                    .then(r => {
-                        if (!r.ok) throw new Error('Network response was not ok');
-                        return r.text();
-                    })
-                    .then(text => {
-                        // Use marked.js (already included in your head) to parse the markdown
-                        const html = marked.parse(text);
-                        content.innerHTML = `<div class="notif-card">${html}</div>`;
-                        Notifications.loaded = true;
-                    })
-                    .catch(e => {
-                        console.error("Notif Error:", e);
-                        content.innerHTML = `<div class="notif-card" style="color:#ef4444">
-                            <strong>Fetch Error:</strong><br>
-                            Failed to load notifications. This is usually due to temporary proxy downtime or connection issues.
-                        </div>`;
-                    });
-            },
-            pushLocal: (title, msg) => {
-                const content = document.getElementById('notif-content');
-                const alertHtml = `<div class="notif-card sys-alert"><h3>${title}</h3><p>${msg}</p></div>`;
-                content.insertAdjacentHTML('afterbegin', alertHtml);
-                
-                const btn = document.querySelector('.system-tray .icon-btn');
-                btn.style.color = '#3b82f6';
-                setTimeout(() => btn.style.color = '', 4000);
-            }
-        };
-
-        const Games = {
-            list: [],
-            render: () => {
-                const track = document.getElementById('card-track');
-                track.innerHTML = "";
-                Games.list = [...DefaultGames, ...State.settings.customGames];
-                
-                Games.list.forEach((g, i) => {
+                this.list.forEach((g, i) => {
                     let card = document.createElement('div');
                     card.className = "game-card";
-                    const isCustom = i >= DefaultGames.length;
-                    
+                    const isCustom = i >= this.app.constants.defaultGames.length;
+
                     let html = ``;
-                    if(g.isNew) html += `<div class="new-badge">New</div>`;
-                    if(isCustom) html += `<div class="card-del-btn" onclick="event.stopPropagation(); Games.removeCustom(${i - DefaultGames.length})"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`;
+                    if (g.isNew) html += `<div class="new-badge">New</div>`;
+                    if (isCustom) html += `<div class="card-del-btn"><i data-lucide="trash-2"></i></div>`;
 
                     html += `<div class="card-inner"><img src="${g.image}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
-                    
+
                     card.innerHTML = html;
                     card.onclick = () => window.open(g.url, '_blank');
-                    card.onmouseenter = () => Games.hero(i);
-                    Games.addTilt(card);
-                    track.appendChild(card);
+                    card.onmouseenter = () => this.updateHero(i);
+                    if (isCustom) {
+                        card.querySelector('.card-del-btn').onclick = (e) => {
+                            e.stopPropagation();
+                            this.removeCustom(i - this.app.constants.defaultGames.length);
+                        };
+                    }
+                    this.addTilt(card);
+                    this.dom.track.appendChild(card);
                 });
 
                 let addTile = document.createElement('div');
                 addTile.className = "game-card add-tile";
-                addTile.innerHTML = `<div class="card-inner"><div class="add-icon"><i data-lucide="plus" style="width:48px; height:48px;"></i></div></div>`;
-                addTile.onclick = () => Modals.open('add-game-modal');
-                Games.addTilt(addTile);
-                track.appendChild(addTile);
+                addTile.innerHTML = `<div class="card-inner"><div class="add-icon"><i data-lucide="plus"></i></div></div>`;
+                addTile.onclick = () => this.app.modals.open('add-game-modal');
+                this.addTilt(addTile);
+                this.dom.track.appendChild(addTile);
 
-                Games.hero(0);
-            },
-            hero: (i) => {
-                if(!Games.list[i]) return;
-                const txt = document.getElementById('hero-text');
-                const btn = document.getElementById('play-btn');
-                txt.style.opacity = 0.5;
-                setTimeout(() => { txt.textContent = Games.list[i].title; txt.style.opacity = 1; }, 100);
-                btn.href = Games.list[i].url;
-            },
-            removeCustom: (idx) => {
-                if(confirm("Remove this app?")) {
-                    State.settings.customGames.splice(idx, 1);
-                    Settings.save('nx_custom_games', JSON.stringify(State.settings.customGames));
-                    Games.render();
+                this.updateHero(0);
+                lucide.createIcons();
+            }
+
+            updateHero(i) {
+                if (!this.list[i]) return;
+                this.dom.heroText.style.opacity = 0.5;
+                setTimeout(() => {
+                    this.dom.heroText.textContent = this.list[i].title;
+                    this.dom.heroText.style.opacity = 1;
+                }, 100);
+                this.dom.playBtn.href = this.list[i].url;
+            }
+
+            removeCustom(idx) {
+                if (confirm("Remove this app?")) {
+                    this.app.state.settings.customGames.splice(idx, 1);
+                    this.app.saveSetting('customGames', JSON.stringify(this.app.state.settings.customGames));
+                    this.render();
                 }
-            },
-            addTilt: (card) => {
+            }
+
+            addTilt(card) {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
-                    const tiltFactor = State.settings.tilt / 1000;
+                    const tiltFactor = this.app.state.settings.tilt / 1000;
                     const maxRot = 25;
 
-                    const x = (e.clientX - rect.left - rect.width/2) / (rect.width/2);
-                    const y = -(e.clientY - rect.top - rect.height/2) / (rect.height/2);
-                    
+                    const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+                    const y = -(e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+
                     const rotX = y * maxRot * tiltFactor;
                     const rotY = x * maxRot * tiltFactor;
 
@@ -1200,284 +869,572 @@ const Notifications = {
                 card.addEventListener('mouseleave', () => {
                     card.querySelector('.card-inner').style.transform = `rotateX(0) rotateY(0)`;
                 });
-            },
-            scroll: (d) => document.getElementById('card-track').scrollBy({ left: d * 320, behavior: 'smooth' })
-        };
+            }
 
-        const Settings = {
-            apply: () => {
-                document.getElementById('theme-toggle').checked = State.settings.lightMode;
-                document.getElementById('time-toggle').checked = State.settings.time24;
-                document.getElementById('ptc-toggle').checked = State.settings.preventClose;
-                document.getElementById('bg-input').value = State.settings.bg;
-                document.getElementById('tilt-val').innerText = State.settings.tilt;
-                document.querySelector('.range-slider').value = State.settings.tilt;
+            scroll(d) {
+                this.dom.track.scrollBy({ left: d * 320, behavior: 'smooth' });
+            }
+        }
 
-                if(State.settings.lightMode) document.body.classList.add('light-mode');
-                Settings.setBg(State.settings.bg);
-                Settings.setCloak(State.settings.cloak);
-            },
-            toggleTheme: () => {
-                State.settings.lightMode = !State.settings.lightMode;
-                document.body.classList.toggle('light-mode', State.settings.lightMode);
-                Settings.save('nx_light', State.settings.lightMode);
-            },
-            toggleTime: () => {
-                State.settings.time24 = !State.settings.time24;
-                Settings.save('nx_time24', State.settings.time24);
-                Clock.update();
-            },
-            togglePrevent: () => {
-                State.settings.preventClose = !State.settings.preventClose;
-                Settings.save('nx_prevent', State.settings.preventClose);
-            },
-            setBg: (url) => {
-                State.settings.bg = url;
-                Settings.save('nx_bg', url);
+        class Settings {
+            constructor(app) {
+                this.app = app;
+                this.dom = {
+                    themeToggle: document.getElementById('theme-toggle'),
+                    timeToggle: document.getElementById('time-toggle'),
+                    ptcToggle: document.getElementById('ptc-toggle'),
+                    bgInput: document.getElementById('bg-input'),
+                    tiltSlider: document.querySelector('.range-slider'),
+                    tiltVal: document.getElementById('tilt-val'),
+                    cloakBtn: document.querySelector('button[onclick*="spoof-modal"]'),
+                    resetBtn: document.querySelector('button[onclick*="OOBE.reset"]'),
+                    changelogBtn: document.querySelector('button[onclick*="Changelog.open"]'),
+                    blankBtn: document.querySelector('button[onclick*="Utils.openBlank"]')
+                };
+                this.initListeners();
+            }
+
+            initListeners() {
+                this.dom.themeToggle.onchange = () => this.toggleTheme();
+                this.dom.timeToggle.onchange = () => this.toggleTime();
+                this.dom.ptcToggle.onchange = () => this.togglePrevent();
+                this.dom.bgInput.onchange = (e) => this.setBg(e.target.value);
+                this.dom.tiltSlider.oninput = (e) => this.setTilt(e.target.value);
+                this.dom.cloakBtn.onclick = () => this.app.modals.open('spoof-modal');
+                this.dom.resetBtn.onclick = () => { if (confirm("Reset Everything?")) { localStorage.clear(); location.reload(); } };
+                this.dom.changelogBtn.onclick = () => this.app.modals.open('changelog-modal');
+                this.dom.blankBtn.onclick = () => this.openBlank();
+            }
+
+            applyAll() {
+                this.dom.themeToggle.checked = this.app.state.settings.lightMode;
+                this.dom.timeToggle.checked = this.app.state.settings.time24;
+                this.dom.ptcToggle.checked = this.app.state.settings.preventClose;
+                this.dom.bgInput.value = this.app.state.settings.bg;
+                this.dom.tiltVal.innerText = this.app.state.settings.tilt;
+                this.dom.tiltSlider.value = this.app.state.settings.tilt;
+
+                if (this.app.state.settings.lightMode) document.body.classList.add('light-mode');
+                this.setBg(this.app.state.settings.bg);
+            }
+
+            toggleTheme() { this.app.saveSetting('lightMode', !this.app.state.settings.lightMode); document.body.classList.toggle('light-mode'); }
+            toggleTime() { this.app.saveSetting('time24', !this.app.state.settings.time24); this.app.clock.update(); }
+            togglePrevent() { this.app.saveSetting('preventClose', !this.app.state.settings.preventClose); }
+            setBg(url) {
+                this.app.saveSetting('bg', url);
                 const wrap = document.getElementById('bg-wrapper');
-                if(url && url.trim() !== "") {
+                if (url && url.trim() !== "") {
                     wrap.style.backgroundImage = `url('${url}')`;
                     document.getElementById('bg-default').style.opacity = 0;
                 } else {
                     wrap.style.backgroundImage = 'none';
                     document.getElementById('bg-default').style.opacity = 1;
                 }
-            },
-            setTilt: (val) => {
-                State.settings.tilt = parseInt(val);
-                document.getElementById('tilt-val').innerText = val;
-                Settings.save('nx_tilt', val);
-            },
-            setCloak: (id) => {
-                State.settings.cloak = id;
-                Settings.save('nx_cloak', id);
-                const s = Spoofs.find(x => x.id === id) || Spoofs[0];
+            }
+            setTilt(val) { this.app.saveSetting('tilt', val); this.dom.tiltVal.innerText = val; }
+            setCloak(id) {
+                this.app.saveSetting('cloak', id);
+                const s = this.app.constants.spoofs.find(x => x.id === id) || this.app.constants.spoofs[0];
                 document.title = s.t;
                 document.getElementById('favicon').href = s.i;
                 document.querySelectorAll('.spoof-item').forEach(el => el.classList.toggle('selected', el.dataset.id === id));
-            },
-            save: (k, v) => localStorage.setItem(k, v)
-        };
+            }
+            openBlank() {
+                let win = window.open();
+                win.document.body.style.margin="0"; win.document.body.style.height="100vh";
+                let iframe = win.document.createElement('iframe');
+                iframe.style.cssText = "border:none; width:100%; height:100%;";
+                iframe.src = window.location.href;
+                win.document.body.appendChild(iframe);
+            }
+        }
 
-        const Clock = {
-            el: document.getElementById('clock'),
-            update: () => {
-                const now = new Date();
-                let h = now.getHours();
-                let m = now.getMinutes();
-                
-                // Check Todo Alarms
-                Todo.checkAlarms(h, m);
-
-                if(!State.settings.time24) {
-                    h = h % 12;
-                    if(h === 0) h = 12;
+        class Modals {
+            constructor(app) {
+                this.app = app;
+                this.changelogLoaded = false;
+                document.querySelectorAll('.modal-overlay .btn-danger').forEach(btn => {
+                    btn.onclick = () => this.close(btn.closest('.modal-overlay').id);
+                });
+            }
+            open(id) {
+                document.getElementById(id).classList.add('active');
+                if (id === 'changelog-modal' && !this.changelogLoaded) {
+                    this.loadChangelog();
                 }
-                const mStr = m < 10 ? '0'+m : m;
-                Clock.el.textContent = `${h}:${mStr}`;
             }
-        };
+            close(id) { document.getElementById(id).classList.remove('active'); }
 
-        const Todo = {
-            toggle: () => {
-                const el = document.getElementById('todo-widget');
-                const isActive = el.classList.toggle('active');
-                if(isActive) document.getElementById('notification-center').classList.remove('active');
-            },
-            handleInput: (e) => { if(e.key==='Enter') Todo.add(); },
-            add: () => {
-                const input = document.getElementById('todo-input');
-                const timeInput = document.getElementById('todo-time');
-                if(!input.value.trim()) return;
-                
-                State.settings.todos.push({ 
-                    t: input.value.trim(), 
-                    time: timeInput.value, // "14:30" format
-                    notified: false 
-                });
-                Settings.save('nx_todos', JSON.stringify(State.settings.todos));
-                Todo.render();
-                input.value = ""; timeInput.value = "";
-            },
-            remove: (i) => {
-                State.settings.todos.splice(i, 1);
-                Settings.save('nx_todos', JSON.stringify(State.settings.todos));
-                Todo.render();
-            },
-            checkAlarms: (h, m) => {
-                const currentStr = `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}`;
-                let changed = false;
-                State.settings.todos.forEach(item => {
-                    if(item.time && !item.notified && item.time === currentStr) {
-                        item.notified = true;
-                        changed = true;
-                        Notifications.pushLocal("Reminder", item.t);
-                        Notifications.toggle(); // Auto open notifs
-                    }
-                });
-                if(changed) Settings.save('nx_todos', JSON.stringify(State.settings.todos));
-            },
-            render: () => {
-                const list = document.getElementById('todo-list');
-                list.innerHTML = "";
-                State.settings.todos.forEach((item, i) => {
-                    let li = document.createElement('li');
-                    li.className = "todo-item";
-                    let timeBadge = item.time ? `<div class="todo-time">⏰ ${item.time}</div>` : '';
-                    li.innerHTML = `
-                        <div class="todo-marker" style="background:${item.notified ? '#22c55e' : '#3b82f6'}"></div>
-                        <div class="todo-content">
-                            <span class="todo-text">${item.t}</span>
-                            ${timeBadge}
-                        </div>
-                        <div class="todo-del" onclick="Todo.remove(${i})"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
-                    `;
-                    list.appendChild(li);
-                });
-            }
-        };
-
-        const AddGame = {
-            type: 'favicon',
-            setType: (t) => {
-                AddGame.type = t;
-                document.getElementById('btn-fav').style.background = t === 'favicon' ? 'rgba(59,130,246,0.2)' : 'transparent';
-                document.getElementById('btn-img').style.background = t === 'image' ? 'rgba(59,130,246,0.2)' : 'transparent';
-                document.getElementById('ag-img-input-container').style.display = t === 'image' ? 'flex' : 'none';
-            },
-            save: async () => {
-                const title = document.getElementById('ag-title').value;
-                const url = document.getElementById('ag-url').value;
-                if(!title || !url) return alert("Required fields missing");
-
-                let img = "";
-                if(AddGame.type === 'favicon') {
-                    let d = url.replace('http://','').replace('https://','').split(/[/?#]/)[0];
-                    img = `https://www.google.com/s2/favicons?domain=${d}&sz=128`;
-                } else {
-                    const iUrl = document.getElementById('ag-img-url').value;
-                    const file = document.getElementById('ag-file').files[0];
-                    if(iUrl) img = iUrl;
-                    else if(file) {
-                        try { img = await Utils.getBase64(file); } catch(e){ return alert("Image Error"); }
-                    } else return alert("Image required");
-                }
-
-                State.settings.customGames.push({ title, url, image: img });
-                Settings.save('nx_custom_games', JSON.stringify(State.settings.customGames));
-                Games.render();
-                Modals.close('add-game-modal');
-                document.getElementById('ag-title').value=""; document.getElementById('ag-url').value="";
-            }
-        };
-
-        const Modals = {
-            open: (id) => document.getElementById(id).classList.add('active'),
-            close: (id) => document.getElementById(id).classList.remove('active')
-        };
-
-        const Changelog = {
-            loaded: false,
-            open: () => {
-                Modals.open('changelog-modal');
-                if (Changelog.loaded) return;
-
+            loadChangelog() {
                 const content = document.getElementById('changelog-content');
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
                 const targetUrl = 'https://pastebin.com/raw/6zCTDTmj';
 
                 fetch(proxyUrl + encodeURIComponent(targetUrl))
                     .then(r => {
-                        if (!r.ok) throw new Error('Network response was not ok');
+                        if (!r.ok) throw new Error('Network error');
                         return r.text();
                     })
                     .then(text => {
                         content.innerHTML = `<div class="notif-card">${marked.parse(text)}</div>`;
-                        Changelog.loaded = true;
+                        this.changelogLoaded = true;
                     })
                     .catch(e => {
-                        console.error("Changelog Error:", e);
-                        content.innerHTML = `<div class="notif-card" style="color:#ef4444">
-                            <strong>Fetch Error:</strong><br>
-                            Failed to load the changelog.
-                        </div>`;
+                        content.innerHTML = `<div class="notif-card" style="color:#ef4444"><strong>Fetch Error</strong><p>Failed to load changelog.</p></div>`;
                     });
             }
-        };
+        }
 
-        const View = {
-            set: (v) => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('.content-view').forEach(c => c.classList.remove('active-view'));
-                
-                const idx = v === 'games' ? 0 : 1;
-                document.querySelectorAll('.nav-item')[idx].classList.add('active');
-                document.getElementById(v+'-view').classList.add('active-view');
+        class OOBE {
+            constructor(app) {
+                this.app = app;
+                this.dom = {
+                    overlay: document.getElementById('oobe-overlay'),
+                    header: document.querySelector('#oobe-overlay .pill-header'),
+                    grid: document.getElementById('oobe-spoof-grid'),
+                    finishBtn: document.querySelector('#oobe-overlay .btn-primary')
+                };
+                this.initListeners();
             }
-        };
 
-        const OOBE = {
-            init: () => {
-                if(!localStorage.getItem(State.oobeKey)) {
-                    const header = document.querySelector('#oobe-overlay .pill-header');
-                    header.innerHTML = '<span class="handwriting">NexusX</span>';
+            initListeners() {
+                this.dom.finishBtn.onclick = () => this.finish();
+            }
 
-                    document.getElementById('oobe-overlay').style.display = 'flex';
-                    // Render Spoofs in OOBE pill
-                    const grid = document.getElementById('oobe-spoof-grid');
-                    Spoofs.forEach(s => {
-                         let d = document.createElement('div'); d.className = "spoof-item"; d.dataset.id = s.id;
-                         d.innerHTML = `<img src="${s.i}" class="spoof-icon"><div class="spoof-name">${s.t}</div>`;
-                         d.onclick = () => Settings.setCloak(s.id);
-                         grid.appendChild(d);
-                    });
-                    
-                    setTimeout(() => document.getElementById('oobe-overlay').classList.add('active'), 50);
+            init() {
+                if (!localStorage.getItem(this.app.state.oobeKey)) {
+                    this.dom.header.innerHTML = '<span class="handwriting">NexusX</span>';
+                    this.dom.overlay.style.display = 'flex';
+                    setTimeout(() => this.dom.overlay.classList.add('active'), 50);
                 } else {
                     document.getElementById('main-interface').classList.add('unlocked');
                 }
-            },
-            finish: () => {
-                localStorage.setItem(State.oobeKey, 'true');
-                document.getElementById('oobe-overlay').classList.remove('active');
-                setTimeout(() => {
-                    document.getElementById('oobe-overlay').style.display = 'none';
-                    document.getElementById('main-interface').classList.add('unlocked');
-                }, 800);
-            },
-            reset: () => { if(confirm("Reset Everything?")) { localStorage.clear(); location.reload(); } }
-        };
-
-        window.onload = () => {
-            if(window.innerWidth < 800) {
-                const meta = document.querySelector('meta[name="viewport"]');
-                if(meta) { meta.setAttribute('content', 'width=device-width, initial-scale=0.1'); setTimeout(() => meta.setAttribute('content', 'width=device-width, initial-scale=1.0'), 50); }
             }
 
-            Settings.apply();
-            Games.render();
-            Todo.render();
-            Clock.update();
-            setInterval(Clock.update, 1000);
-            
-            // Populate Settings Spoof Grid
-            const sg = document.getElementById('settings-spoof-grid');
-            Spoofs.forEach(s => {
-                let d = document.createElement('div'); d.className = "spoof-item"; d.dataset.id = s.id;
-                d.innerHTML = `<img src="${s.i}" class="spoof-icon"><div class="spoof-name">${s.t}</div>`;
-                d.onclick = () => Settings.setCloak(s.id);
-                sg.appendChild(d);
-            });
-            Settings.setCloak(State.settings.cloak);
-            OOBE.init();
+            finish() {
+                localStorage.setItem(this.app.state.oobeKey, 'true');
+                this.dom.overlay.classList.remove('active');
+                setTimeout(() => {
+                    this.dom.overlay.style.display = 'none';
+                    document.getElementById('main-interface').classList.add('unlocked');
+                }, 800);
+            }
+        }
+        class AddGame {
+            constructor(app) {
+                this.app = app;
+                this.type = 'favicon';
+                this.dom = {
+                    title: document.getElementById('ag-title'),
+                    url: document.getElementById('ag-url'),
+                    imgUrl: document.getElementById('ag-img-url'),
+                    file: document.getElementById('ag-file'),
+                    btnFav: document.getElementById('btn-fav'),
+                    btnImg: document.getElementById('btn-img'),
+                    imgContainer: document.getElementById('ag-img-input-container'),
+                    saveBtn: document.querySelector('#add-game-modal .btn-primary')
+                };
+                this.initListeners();
+            }
 
-            // Init Lucide
-            lucide.createIcons();
-        };
+            initListeners() {
+                this.dom.btnFav.onclick = () => this.setType('favicon');
+                this.dom.btnImg.onclick = () => this.setType('image');
+                this.dom.saveBtn.onclick = () => this.save();
+            }
+
+            setType(t) {
+                this.type = t;
+                this.dom.btnFav.style.background = t === 'favicon' ? 'rgba(59,130,246,0.2)' : 'transparent';
+                this.dom.btnImg.style.background = t === 'image' ? 'rgba(59,130,246,0.2)' : 'transparent';
+                this.dom.imgContainer.style.display = t === 'image' ? 'flex' : 'none';
+            }
+
+            async save() {
+                const title = this.dom.title.value;
+                const url = this.dom.url.value;
+                if (!title || !url) return alert("Required fields missing");
+
+                let img = "";
+                if (this.type === 'favicon') {
+                    let d = url.replace('http://','').replace('https://','').split(/[/?#]/)[0];
+                    img = `https://www.google.com/s2/favicons?domain=${d}&sz=128`;
+                } else {
+                    const iUrl = this.dom.imgUrl.value;
+                    const file = this.dom.file.files[0];
+                    if (iUrl) img = iUrl;
+                    else if (file) {
+                        try { img = await this.getBase64(file); } catch (e) { return alert("Image Error"); }
+                    } else return alert("Image required");
+                }
+
+                this.app.state.settings.customGames.push({ title, url, image: img });
+                this.app.saveSetting('customGames', JSON.stringify(this.app.state.settings.customGames));
+                this.app.games.render();
+                this.app.modals.close('add-game-modal');
+                this.dom.title.value = ""; this.dom.url.value = "";
+            }
+
+            getBase64(file) {
+                return new Promise((res, rej) => {
+                    const r = new FileReader(); r.readAsDataURL(file);
+                    r.onload = () => res(r.result); r.onerror = e => rej(e);
+                });
+            }
+        }
+        class Notifications {
+            constructor(app) {
+                this.app = app;
+                this.loaded = false;
+                this.dom = {
+                    widget: document.getElementById('notification-center'),
+                    content: document.getElementById('notif-content')
+                };
+            }
+
+            isOpen() {
+                return this.dom.widget.classList.contains('active');
+            }
+
+            toggle() {
+                const isActive = this.dom.widget.classList.toggle('active');
+                if (isActive && !this.loaded) {
+                    this.reload();
+                }
+            }
+
+            reload() {
+                this.dom.content.innerHTML = '<div class="notif-loading">Checking for updates...</div>';
+                
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const targetUrl = 'https://pastebin.com/raw/6zCTDTmj';
+
+                fetch(proxyUrl + encodeURIComponent(targetUrl))
+                    .then(r => {
+                        if (!r.ok) throw new Error('Network error');
+                        return r.text();
+                    })
+                    .then(text => {
+                        const newNotifId = text.substring(0, 50); // Use first 50 chars as a unique ID
+
+                        if (newNotifId !== this.app.state.settings.lastNotifId) {
+                            this.app.saveSetting('lastNotifId', newNotifId);
+                            if (!this.isOpen()) {
+                                this.toggle();
+                            }
+                        }
+
+                        this.dom.content.innerHTML = `<div class="notif-card">${marked.parse(text)}</div>`;
+                        this.loaded = true;
+                    })
+                    .catch(e => {
+                        this.dom.content.innerHTML = `<div class="notif-card" style="color:#ef4444"><strong>Fetch Error</strong><p>Failed to load notifications.</p></div>`;
+                    });
+            }
+
+            pushLocal(title, msg) {
+                const alertHtml = `<div class="notif-card sys-alert"><h3>${title}</h3><p>${msg}</p></div>`;
+                this.dom.content.insertAdjacentHTML('afterbegin', alertHtml);
+            }
+        }
+
+                this.init();
+            }
+
+            loadSettings() {
+                return {
+                    time24: localStorage.getItem('nx_time24') === 'true',
+                    preventClose: localStorage.getItem('nx_prevent') === 'true',
+                    cloak: localStorage.getItem('nx_cloak') || 'none',
+                    bg: localStorage.getItem('nx_bg') || '',
+                    todos: JSON.parse(localStorage.getItem('nx_todos') || '[]'),
+                    lightMode: localStorage.getItem('nx_light') === 'true',
+                    tilt: parseInt(localStorage.getItem('nx_tilt') || '500'),
+                    customGames: JSON.parse(localStorage.getItem('nx_custom_games') || '[]'),
+                    lastNotifId: localStorage.getItem('nx_last_notif_id') || null
+                };
+            }
+
+            saveSetting(key, value) {
+                localStorage.setItem(key, value);
+                this.state.settings[key] = value;
+            }
+
+            init() {
+                this.ui.initViewport();
+                this.settings.applyAll();
+                this.games.render();
+                this.todo.render();
+                this.clock.start();
+                this.ui.populateSpoofGrids();
+                this.settings.setCloak(this.state.settings.cloak);
+                this.oobe.init();
+                this.initGlobalListeners();
+
+                lucide.createIcons();
+            }
+
+            initGlobalListeners() {
+                window.addEventListener('beforeunload', (e) => {
+                    if (this.state.settings.preventClose) {
+                        e.preventDefault();
+                        e.returnValue = '';
+                    }
+                });
+            }
+        }
+        class UIManager {
+            constructor(app) {
+                this.app = app;
+                document.getElementById('clock').onclick = () => this.app.todo.toggle();
+                document.querySelector('[data-action="toggle-notifications"]').onclick = () => this.app.notifications.toggle();
+                document.querySelector('[data-action="reload-notifications"]').onclick = () => this.app.notifications.reload();
+                document.querySelector('[data-action="toggle-music"]').onclick = () => this.app.music.toggle();
+                document.querySelector('[data-action="toggle-fullscreen"]').onclick = () => this.toggleFullscreen();
+
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.onclick = () => this.setView(item.dataset.view);
+                });
+            }
+
+            setView(view) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.content-view').forEach(c => c.classList.remove('active-view'));
+
+                document.querySelector(`.nav-item[data-view="${view}"]`).classList.add('active');
+                document.getElementById(`${view}-view`).classList.add('active-view');
+            }
+
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+
+            initViewport() {
+                if (window.innerWidth < 800) {
+                    const meta = document.querySelector('meta[name="viewport"]');
+                    if (meta) {
+                        meta.setAttribute('content', 'width=device-width, initial-scale=0.1');
+                        setTimeout(() => meta.setAttribute('content', 'width=device-width, initial-scale=1.0'), 50);
+                    }
+                }
+            }
+        }
+
+        class Clock {
+            constructor(app) {
+                this.app = app;
+                this.dom = {
+                    el: document.getElementById('clock')
+                };
+            }
+
+            start() {
+                this.update();
+                setInterval(() => this.update(), 1000);
+            }
+
+            update() {
+                const now = new Date();
+                let h = now.getHours();
+                let m = now.getMinutes();
+
+                this.app.todo.checkAlarms();
+
+                if (!this.app.state.settings.time24) {
+                    h = h % 12;
+                    if (h === 0) h = 12;
+                }
+                const mStr = m < 10 ? '0' + m : m;
+                this.dom.el.textContent = `${h}:${mStr}`;
+            }
+        }
+        class Todo {
+            constructor(app) {
+                this.app = app;
+                this.dom = {
+                    widget: document.getElementById('todo-widget'),
+                    list: document.getElementById('todo-list'),
+                    input: document.getElementById('todo-input'),
+                    timeInput: document.getElementById('todo-time'),
+                    addBtn: document.getElementById('add-todo-btn')
+                };
+                this.initListeners();
+            }
+
+            initListeners() {
+                this.dom.addBtn.onclick = () => this.add();
+                this.dom.input.onkeypress = (e) => {
+                    if (e.key === 'Enter') this.add();
+                };
+            }
+
+            toggle() {
+                this.dom.widget.classList.toggle('active');
+            }
+
+            add() {
+                const text = this.dom.input.value.trim();
+                if (!text) return;
+
+                const newItem = {
+                    id: Date.now(),
+                    text: text,
+                    time: this.dom.timeInput.value,
+                    done: false,
+                    notified: false
+                };
+
+                this.app.state.settings.todos.push(newItem);
+                this.app.saveSetting('todos', JSON.stringify(this.app.state.settings.todos));
+                this.render();
+                this.dom.input.value = '';
+                this.dom.timeInput.value = '';
+            }
+
+            remove(id) {
+                this.app.state.settings.todos = this.app.state.settings.todos.filter(item => item.id !== id);
+                this.app.saveSetting('todos', JSON.stringify(this.app.state.settings.todos));
+                this.render();
+            }
+
+            toggleDone(id) {
+                const item = this.app.state.settings.todos.find(item => item.id === id);
+                if (item) {
+                    item.done = !item.done;
+                    this.app.saveSetting('todos', JSON.stringify(this.app.state.settings.todos));
+                    this.render();
+                }
+            }
+
+            checkAlarms() {
+                const now = new Date();
+                const h = now.getHours();
+                const m = now.getMinutes();
+                const currentStr = `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
+                let changed = false;
+
+                this.app.state.settings.todos.forEach(item => {
+                    if (item.time && !item.notified && item.time === currentStr) {
+                        item.notified = true;
+                        changed = true;
+                        this.app.notifications.pushLocal("Reminder", item.text);
+                        if (!this.app.notifications.isOpen()) {
+                            this.app.notifications.toggle();
+                        }
+                    }
+                });
+
+                if (changed) {
+                    this.app.saveSetting('todos', JSON.stringify(this.app.state.settings.todos));
+                    this.render();
+                }
+            }
+
+            render() {
+                this.dom.list.innerHTML = "";
+                if (this.app.state.settings.todos.length === 0) {
+                    this.dom.list.innerHTML = `<li class="todo-empty">No tasks yet!</li>`;
+                    return;
+                }
+
+                this.app.state.settings.todos.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = `todo-item ${item.done ? 'done' : ''}`;
+                    li.dataset.id = item.id;
+
+                    let timeBadge = item.time ? `<div class="todo-time"><i data-lucide="alarm-clock" class="icon-sm"></i> ${item.time}</div>` : '';
+
+                    li.innerHTML = `
+                        <div class="todo-marker"></div>
+                        <div class="todo-content">
+                            <span class="todo-text">${item.text}</span>
+                            ${timeBadge}
+                        </div>
+                        <div class="todo-del"><i data-lucide="trash-2"></i></div>
+                    `;
+
+                    li.querySelector('.todo-marker').onclick = () => this.toggleDone(item.id);
+                    li.querySelector('.todo-del').onclick = (e) => {
+                        e.stopPropagation();
+                        this.remove(item.id);
+                    };
+
+                    this.dom.list.appendChild(li);
+                });
+                lucide.createIcons();
+            }
+        }
+        class MusicApp {
+            constructor(app) {
+                this.app = app;
+                this.loaded = false;
+                this.dom = {
+                    win: document.getElementById('music-window'),
+                    header: document.getElementById('mw-header'),
+                    iframe: document.getElementById('music-frame'),
+                    closeBtn: document.querySelector('.win-close')
+                };
+                this.initListeners();
+            }
+
+            initListeners() {
+                this.dom.closeBtn.onclick = () => this.toggle();
+            }
+
+            init() {
+                if (this.loaded) return;
+                this.dom.iframe.srcdoc = this.getIframeHTML();
+                this.initDraggable();
+                this.loaded = true;
+            }
+
+            toggle() {
+                const isActive = this.dom.win.classList.toggle('active');
+                if (isActive) this.init();
+            }
+
+            initDraggable() {
+                let isDragging = false, startX, startY;
+                let currentX = 0, currentY = 0;
+
+                this.dom.header.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    this.dom.win.classList.add('dragging');
+                    startX = e.clientX;
+                    startY = e.clientY;
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    
+                    this.dom.win.style.setProperty('--drag-x', `${currentX + dx}px`);
+                    this.dom.win.style.setProperty('--drag-y', `${currentY + dy}px`);
+                });
+
+                document.addEventListener('mouseup', (e) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    this.dom.win.classList.remove('dragging');
+
+                    // Save the final position
+                    currentX += e.clientX - startX;
+                    currentY += e.clientY - startY;
+                });
+            }
         
-        window.addEventListener('beforeunload', (e) => {
-            if(State.settings.preventClose) { e.preventDefault(); e.returnValue = ''; }
-        });
+            getIframeHTML() {
+                return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"><\/script><style>:root{--bg-oled:#050505;--accent-red:#ff3333;--accent-glow:rgba(255,51,51,0.4);--glass:rgba(20,20,20,0.7);--border:rgba(255,255,255,0.1);--text:#fff;--text-dim:#a0a0a0}*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',-apple-system,system-ui,sans-serif;user-select:none}body{background-color:var(--bg-oled);color:var(--text);height:100vh;width:100vw;overflow:hidden;display:flex;align-items:center;justify-content:center}.ambient-glow{position:absolute;width:100vw;height:100vh;background:radial-gradient(circle at 50% 50%,rgba(255,51,51,0.08) 0%,transparent 70%);z-index:0;pointer-events:none}.nexus-shell{width:100%;height:100%;background:var(--glass);backdrop-filter:blur(60px) saturate(160%);-webkit-backdrop-filter:blur(60px) saturate(160%);display:flex;overflow:hidden;position:relative;z-index:10}.zone-left{flex:1.1;padding:40px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--border)}.zone-right{flex:.9;display:flex;flex-direction:column;background:rgba(0,0,0,0.2)}.art-wrapper{width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.8);position:relative;border:1px solid var(--border);background:#000}#cover-img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(0.16,1,0.3,1)}#video-element{width:100%;height:100%;object-fit:contain;display:none}.track-info{margin-top:25px}.track-title{font-size:2.2rem;font-weight:800;letter-spacing:-1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.track-artist{font-size:1rem;color:var(--accent-red);font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:2px;opacity:.9}.controls-stack{margin-top:auto;display:flex;flex-direction:column;gap:20px}input[type=range]{-webkit-appearance:none;width:100%;background:transparent;height:20px;cursor:pointer}input[type=range]::-webkit-slider-runnable-track{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:14px;width:14px;border-radius:50%;background:var(--accent-red);margin-top:-5px;box-shadow:0 0 12px var(--accent-glow);transition:.2s}input[type=range]:active::-webkit-slider-thumb{transform:scale(1.3)}.time-display{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text-dim);font-family:'Monaco',monospace;margin-top:6px}.main-buttons{display:flex;justify-content:center;align-items:center;gap:35px}.btn{background:0 0;border:none;color:var(--text);font-size:1.4rem;cursor:pointer;transition:.3s;opacity:.8}.btn:hover{color:var(--accent-red);opacity:1;transform:scale(1.1)}.btn-play{width:65px;height:65px;border-radius:50%;background:var(--accent-red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;opacity:1;box-shadow:0 10px 25px var(--accent-glow)}.bass-module{background:rgba(255,255,255,0.03);border-radius:14px;padding:18px;border:1px solid var(--border)}.bass-header{display:flex;justify-content:space-between;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;color:var(--text-dim)}.header-bar{padding:30px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:900;letter-spacing:3px;font-size:1.1rem}.brand span{color:var(--accent-red)}.file-upload-label{background:var(--accent-red);color:#fff;padding:10px 22px;border-radius:30px;font-size:.75rem;cursor:pointer;transition:.3s;font-weight:700;box-shadow:0 5px 15px var(--accent-glow)}.file-upload-label:hover{transform:translateY(-2px);filter:brightness(1.1)}#file-input{display:none}#visualizer{width:100%;height:100%;flex:1}<\/style><\/head><body><div class="ambient-glow"><\/div><div class="nexus-shell"><div class="zone-left"><div class="art-wrapper"><img id="cover-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><video id="video-element" crossorigin="anonymous" playsinline><\/video><\/div><div class="track-info"><div id="title-display" class="track-title">NexusX Studio<\/div><div id="artist-display" class="track-artist">System Ready<\/div><\/div><div class="controls-stack"><div class="main-buttons"><button class="btn" id="btn-prev"><i class="fas fa-backward"><\/i><\/button><button class="btn btn-play" id="btn-play"><i class="fas fa-play"><\/i><\/button><button class="btn" id="btn-next"><i class="fas fa-forward"><\/i><\/button><\/div><div><input type="range" id="seek-slider" value="0" max="1000"><div class="time-display"><span id="curr-time">0:00<\/span><span id="dur-time">0:00<\/span><\/div><\/div><div class="bass-module"><div class="bass-header"><span>Sub-Bass Enhancement<\/span><span id="bass-val" style="color:var(--accent-red)">0%<\/span><\/div><input type="range" id="bass-slider" min="0" max="100" value="0"><\/div><\/div><\/div><div class="zone-right"><div class="header-bar"><div class="brand">NEXUS<span>STUDIO<\/span><\/div><label for="file-input" class="file-upload-label"><i class="fas fa-plus"><\/i> ADD MEDIA<\/label><input type="file" id="file-input" accept="audio/*,video/*"><\/div><canvas id="visualizer"><\/canvas><\/div><\/div><script>class NexusPlayer{constructor(){this.audioEl=new Audio,this.videoEl=document.getElementById("video-element"),this.activeMedia=this.audioEl,this.audioCtx=null,this.nodes={},this.ui={playBtn:document.getElementById("btn-play"),playIcon:document.querySelector("#btn-play i"),seek:document.getElementById("seek-slider"),bass:document.getElementById("bass-slider"),bassVal:document.getElementById("bass-val"),currTime:document.getElementById("curr-time"),durTime:document.getElementById("dur-time"),fileIn:document.getElementById("file-input"),title:document.getElementById("title-display"),artist:document.getElementById("artist-display"),cover:document.getElementById("cover-img"),canvas:document.getElementById("visualizer")},this.ctx=this.ui.canvas.getContext("2d",{alpha:!1}),this.setupEvents(),this.resize(),window.addEventListener("resize",()=>this.resize())}initAudioEngine(){if(this.audioCtx)return;const e=window.AudioContext||window.webkitAudioContext;this.audioCtx=new e({latencyHint:"playback"}),this.nodes.audioSrc=this.audioCtx.createMediaElementSource(this.audioEl),this.nodes.videoSrc=this.audioCtx.createMediaElementSource(this.videoEl),this.nodes.bassShelf=this.audioCtx.createBiquadFilter(),this.nodes.bassShelf.type="lowshelf",this.nodes.bassShelf.frequency.value=100,this.nodes.bassPunch=this.audioCtx.createBiquadFilter(),this.nodes.bassPunch.type="peaking",this.nodes.bassPunch.frequency.value=60,this.nodes.bassPunch.Q.value=1.5,this.nodes.compressor=this.audioCtx.createDynamicsCompressor(),this.nodes.compressor.threshold.setValueAtTime(-24,this.audioCtx.currentTime),this.nodes.compressor.knee.setValueAtTime(30,this.audioCtx.currentTime),this.nodes.compressor.ratio.setValueAtTime(3,this.audioCtx.currentTime),this.nodes.compressor.attack.setValueAtTime(.003,this.audioCtx.currentTime),this.nodes.compressor.release.setValueAtTime(.25,this.audioCtx.currentTime),this.nodes.analyser=this.audioCtx.createAnalyser(),this.nodes.analyser.fftSize=512,this.nodes.analyser.smoothingTimeConstant=.8,this.nodes.bassShelf.connect(this.nodes.bassPunch),this.nodes.bassPunch.connect(this.nodes.compressor),this.nodes.compressor.connect(this.nodes.analyser),this.nodes.analyser.connect(this.audioCtx.destination),this.routeSource(),this.draw()}routeSource(){this.nodes.audioSrc.disconnect(),this.nodes.videoSrc.disconnect();(this.activeMedia===this.videoEl?this.nodes.videoSrc:this.nodes.audioSrc).connect(this.nodes.bassShelf)}setupEvents(){this.ui.playBtn.onclick=()=>this.toggle(),this.ui.fileIn.onchange=e=>this.load(e.target.files[0]),this.ui.seek.oninput=e=>{const t=e.target.value/1e3*this.activeMedia.duration;this.activeMedia.currentTime=t},this.ui.bass.oninput=e=>{const t=e.target.value;this.ui.bassVal.innerText=\`\${t}%\`,this.nodes.bassShelf&&(this.nodes.bassShelf.gain.setTargetAtTime(.12*t,this.audioCtx.currentTime,.1),this.nodes.bassPunch.gain.setTargetAtTime(.08*t,this.audioCtx.currentTime,.1))};const e=()=>{this.activeMedia.paused||(this.ui.seek.value=this.activeMedia.currentTime/this.activeMedia.duration*1e3||0,this.ui.currTime.innerText=this.format(this.activeMedia.currentTime),this.ui.durTime.innerText=this.format(this.activeMedia.duration)),requestAnimationFrame(e)};e()}async load(e){if(!e)return;this.initAudioEngine(),this.activeMedia.src&&URL.revokeObjectURL(this.activeMedia.src);const t=URL.createObjectURL(e),i=e.type.startsWith("video");this.activeMedia=i?this.videoEl:this.audioEl,this.videoEl.style.display=i?"block":"none",this.ui.cover.style.display=i?"none":"block",this.audioEl.pause(),this.videoEl.pause(),this.activeMedia.src=t,this.routeSource(),this.ui.title.innerText=e.name,this.ui.artist.innerText=i?"Video Media":"Loading Tags...",i||this.getTags(e),this.activeMedia.play().then(()=>{this.ui.playIcon.className="fas fa-pause"})}getTags(e){window.jsmediatags&&window.jsmediatags.read(e,{onSuccess:t=>{this.ui.title.innerText=t.tags.title||e.name,this.ui.artist.innerText=t.tags.artist||"Unknown Artist",t.tags.picture&&(()=>{const{data:e,format:i}=t.tags.picture;let s="";for(let t=0;t<e.length;t++)s+=String.fromCharCode(e[t]);this.ui.cover.src=\`data:\${i};base64,\${btoa(s)}\`})()},onError:()=>{this.ui.artist.innerText="Local Audio"}})}toggle(){this.initAudioEngine(),this.activeMedia.paused?(this.activeMedia.play(),this.ui.playIcon.className="fas fa-pause"):(this.activeMedia.pause(),this.ui.playIcon.className="fas fa-play")}format(e){if(isNaN(e))return"0:00";const t=Math.floor(e/60),i=Math.floor(e%60);return\`\${t}:\${i<10?"0"+i:i}\`}resize(){this.ui.canvas.width=this.ui.canvas.offsetWidth*window.devicePixelRatio,this.ui.canvas.height=this.ui.canvas.offsetHeight*window.devicePixelRatio}draw(){requestAnimationFrame(()=>this.draw());const e=new Uint8Array(this.nodes.analyser.frequencyBinCount);this.nodes.analyser.getByteFrequencyData(e);const t=this.ui.canvas.width,i=this.ui.canvas.height;this.ctx.fillStyle="#050505",this.ctx.fillRect(0,0,t,i);const s=t/e.length*2.5;let o=0;for(let n=0;n<e.length;n++){const a=e[n]/255*i*.8,d=255,l=51,r=51;this.ctx.fillStyle=\`rgba(\${d},\${l},\${r},\${e[n]/255})\`,this.ctx.shadowBlur=15,this.ctx.shadowColor="rgba(255, 51, 51, 0.5)",this.ctx.beginPath(),this.ctx.roundRect(o,i-a,s-4,a,[10,10,0,0]),this.ctx.fill(),o+=s}}}window.onload=()=>new NexusPlayer;<\/script><\/body><\/html>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => new NexusApp());
     </script>
 </body>
 </html>
