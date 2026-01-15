@@ -665,8 +665,11 @@ const musicPlayerHTML = `<!DOCTYPE html>
             display: flex; overflow: hidden; position: relative; z-index: 10;
         }
 
-        .zone-left { flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--border); }
-        .zone-right { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
+        .zone-left { 
+            flex: 1; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--border); 
+            min-width: 300px; overflow: hidden;
+        }
+        .zone-right { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); min-width: 250px; }
         
         /* PLAYLIST STYLING */
         .playlist-header { font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); padding: 0 30px 15px 30px; border-bottom: 1px solid var(--border); }
@@ -683,19 +686,20 @@ const musicPlayerHTML = `<!DOCTYPE html>
         .playlist-item .track-artist { font-size: 0.8rem; color: var(--text-dim); }
 
         .art-wrapper { 
-            width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; 
+            width: 100%; max-height: 45vh; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; 
             box-shadow: 0 25px 60px rgba(0,0,0,0.8); position: relative; 
             border: 1px solid var(--border); background: #000;
+            margin: 0 auto;
         }
         
         #cover-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         #video-element { width: 100%; height: 100%; object-fit: contain; display: none; }
 
-        .track-info { margin-top: 25px; }
-        .track-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-artist { font-size: 1rem; color: var(--accent); font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
+        .track-info { margin-top: 15px; flex-shrink: 0; }
+        .track-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-artist { font-size: 0.9rem; color: var(--accent); font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
         
-        .controls-stack { margin-top: auto; display: flex; flex-direction: column; gap: 20px; }
+        .controls-stack { margin-top: auto; display: flex; flex-direction: column; gap: 15px; padding-top: 15px; flex-shrink: 0; }
         
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 20px; cursor: pointer; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
@@ -707,12 +711,12 @@ const musicPlayerHTML = `<!DOCTYPE html>
         .main-buttons { display: flex; justify-content: center; align-items: center; gap: 35px; }
         .btn { background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; transition: 0.3s; opacity: 0.8; }
         .btn:hover { color: var(--accent); opacity: 1; transform: scale(1.1); }
-        .btn-play { width: 65px; height: 65px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; opacity: 1; box-shadow: 0 10px 25px var(--accent-glow); }
+        .btn-play { width: 55px; height: 55px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; opacity: 1; box-shadow: 0 10px 25px var(--accent-glow); }
         
-        .bass-module { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 18px; border: 1px solid var(--border); }
-        .bass-header { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; color: var(--text-dim); }
+        .bass-module { background: rgba(255,255,255,0.03); border-radius: 14px; padding: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; }
+        .bass-header { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; color: var(--text-dim); }
         
-        .header-bar { padding: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-bar { padding: 30px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .brand { font-weight: 900; letter-spacing: 3px; font-size: 1.1rem; }
         .brand span { color: var(--accent); }
         
@@ -721,9 +725,38 @@ const musicPlayerHTML = `<!DOCTYPE html>
         #file-input { display: none; }
         
         #visualizer { width: 100%; height: 150px; flex: none; }
+
+        /* EASTER EGG CSS */
+        #secret-overlay {
+            position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: black; color: white; font-size: 4rem; font-weight: 900; letter-spacing: 2px;
+            opacity: 0; pointer-events: none; transition: opacity 1s ease; z-index: 1000;
+            text-align: center;
+        }
+
+        .black-hole-anim { animation: implode 2.5s cubic-bezier(0.5, 0, 1, 1) forwards; }
+        .big-bang-anim { animation: explode 1s cubic-bezier(0, 0.5, 0.5, 1) forwards; }
+
+        @keyframes implode {
+            0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+            50% { transform: scale(0.5) rotate(180deg); filter: brightness(0.5); }
+            100% { transform: scale(0) rotate(720deg); filter: brightness(0); }
+        }
+        @keyframes explode {
+            0% { transform: scale(0); filter: brightness(2); }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        @media (max-width: 800px) {
+            .nexus-shell { flex-direction: column; overflow-y: auto; }
+            .zone-left, .zone-right { width: 100%; overflow: visible; }
+            .art-wrapper { max-height: 300px; width: 300px; }
+        }
     </style>
 </head>
 <body>
+    <div id="secret-overlay">YIPEEE GOOD SONG :)</div>
     <div class="ambient-glow"></div>
     <div class="nexus-shell">
         <div class="zone-left">
@@ -814,6 +847,7 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 this.nodes = {};
                 this.playlist = [];
                 this.currentIndex = 0;
+                this.hasImploded = false;
 
                 this.ui = {
                     playBtn: document.getElementById('btn-play'),
@@ -830,7 +864,9 @@ const musicPlayerHTML = `<!DOCTYPE html>
                     artist: document.getElementById('artist-display'),
                     cover: document.getElementById('cover-img'),
                     canvas: document.getElementById('visualizer'),
-                    playlist: document.getElementById('playlist')
+                    playlist: document.getElementById('playlist'),
+                    shell: document.querySelector('.nexus-shell'),
+                    overlay: document.getElementById('secret-overlay')
                 };
                 this.accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
             }
@@ -934,6 +970,8 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 await DB.savePlaylist(this.playlist);
                 this.renderPlaylist();
                 this.playTrack(0);
+                
+                // Process metadata after UI update
                 this.playlist.forEach((track, index) => this.getTags(track.file, index));
             }
 
@@ -1016,6 +1054,37 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 this.ui.title.innerText = track.title;
                 this.ui.artist.innerText = track.artist;
                 this.ui.cover.src = track.cover;
+
+                // --- EASTER EGG PROTOCOL ---
+                const artistLower = track.artist.toLowerCase();
+                if (artistLower.includes('twenty one pilots') || artistLower.includes('twentyonepilots')) {
+                    this.triggerEasterEgg();
+                }
+            }
+
+            triggerEasterEgg() {
+                if(this.hasImploded) return;
+                this.hasImploded = true;
+                
+                // Add blackhole effect
+                this.ui.shell.classList.add('black-hole-anim');
+                
+                // Fade in text after implosion starts
+                setTimeout(() => {
+                    this.ui.overlay.style.opacity = 1;
+                }, 1500);
+
+                // Wait, then reset
+                setTimeout(() => {
+                    this.ui.overlay.style.opacity = 0;
+                    this.ui.shell.classList.remove('black-hole-anim');
+                    this.ui.shell.classList.add('big-bang-anim');
+                    
+                    setTimeout(() => {
+                        this.ui.shell.classList.remove('big-bang-anim');
+                        this.hasImploded = false; 
+                    }, 1000);
+                }, 4000);
             }
 
             renderPlaylist() {
@@ -1032,25 +1101,32 @@ const musicPlayerHTML = `<!DOCTYPE html>
 
             getTags(file, index) {
                 if (window.jsmediatags) {
-                    window.jsmediatags.read(file, {
+                    new window.jsmediatags.Reader(file)
+                    .setTagsToRead(["title", "artist", "picture"])
+                    .read({
                         onSuccess: (tag) => {
                             const track = this.playlist[index];
                             if (!track) return;
-                            track.title = tag.tags.title || file.name;
+                            
+                            track.title = tag.tags.title || file.name.replace(/\.[^/.]+$/, "");
                             track.artist = tag.tags.artist || "Unknown Artist";
+                            
                             if (tag.tags.picture) {
                                 const { data, format } = tag.tags.picture;
                                 let base64 = "";
                                 for (let i = 0; i < data.length; i++) base64 += String.fromCharCode(data[i]);
                                 track.cover = \`data:\${format};base64,\${btoa(base64)}\`;
                             }
+                            
                             if (index === this.currentIndex) this.updateUI(track);
                             this.renderPlaylist();
                         },
-                        onError: () => {
+                        onError: (error) => {
+                            console.log('Error reading tags:', error.type, error.info);
                             const track = this.playlist[index];
                             if (!track) return;
-                            track.artist = "Local Audio";
+                            track.title = file.name.replace(/\.[^/.]+$/, "");
+                            track.artist = "Unknown Artist";
                             if (index === this.currentIndex) this.updateUI(track);
                             this.renderPlaylist();
                         }
