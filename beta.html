@@ -1,394 +1,247 @@
-<!DOCTYPE html>
 <html lang="en">
+<meta name="NexusOS" content="NexusX">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coming Soon - NexusOS</title>
-    <meta name="NexusOS" content="NexusX">
-    
-    <!-- 
-      FIXED IMPORT MAP:
-      1. Using stable React 18.2.0.
-      2. 'motion/react' includes '?external=react,react-dom'.
-         This forces Motion to use the exact React instance defined above, preventing the crash.
-    -->
-    <script type="importmap">
-    {
-        "imports": {
-            "react": "https://esm.sh/react@18.2.0",
-            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-            "motion/react": "https://esm.sh/motion@12.0.0-alpha.2/react?external=react,react-dom",
-            "canvas-confetti": "https://esm.sh/canvas-confetti@1.9.2"
-        }
-    }
-    </script>
-    
-    <!-- Babel for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Coming Soon</title>
+   <style>
+       :root {
+           --accent: #a4c8f2; 
+           --bg-dark: #10121a; 
+           --glass-bg: rgba(255, 255, 255, 0.04); 
+           --glass-border: rgba(255, 255, 255, 0.15); 
+           --text-main: #e8eaf2;
+           --text-muted: #8c909c;
+           --blur-strength: 40px; 
+       }
+       * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+   body {
+       background-color: var(--bg-dark);
+       color: var(--text-main);
+       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+       height: 100vh;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       overflow: hidden;
+       perspective: 1200px; 
+       background-image: radial-gradient(circle at center, rgba(30, 35, 50, 0.8) 0%, rgba(16, 18, 26, 1) 70%);
+   }
 
-        :root {
-            --accent: #a4c8f2; 
-            --bg-dark: #10121a; 
-            --glass-bg: rgba(255, 255, 255, 0.04); 
-            --glass-border: rgba(255, 255, 255, 0.15); 
-            --text-main: #e8eaf2;
-            --text-muted: #8c909c;
-            --blur-strength: 40px; 
-        }
+   #starfield {
+       position: absolute;
+       top: 0; left: 0;
+       width: 100%; height: 100%;
+       z-index: -1; opacity: 0.3;
+   }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden;
-        }
+   .tilt-card {
+       position: relative;
+       width: 90%;
+       max-width: 550px;
+       padding: 3rem 2.5rem;
+       background: var(--glass-bg);
+       border: 1px solid var(--glass-border);
+       border-radius: 30px; 
+       backdrop-filter: blur(var(--blur-strength));
+       -webkit-backdrop-filter: blur(var(--blur-strength));
+       box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.8), 0 0 50px rgba(164, 200, 242, 0.1);
+       transform-style: preserve-3d;
+       text-align: center;
+       transition: transform 0.1s ease-out;
+   }
 
-        #root {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1200px;
-            background-image: radial-gradient(circle at center, rgba(30, 35, 50, 0.8) 0%, rgba(16, 18, 26, 1) 70%);
-        }
+   .icon-container { transform: translateZ(50px); margin-bottom: 2rem; }
+   .region-icon { font-size: 4rem; color: var(--accent); text-shadow: 0 0 15px rgba(164, 200, 242, 0.6); animation: float-icon 5s ease-in-out infinite alternate; display: block; }
 
-        .text-gradient {
-            background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .shadow-glow {
-            text-shadow: 0 0 15px rgba(164, 200, 242, 0.6);
-        }
-    </style>
+   h1 {
+       font-size: 5rem; 
+       font-weight: 900; 
+       line-height: 1.2; /* Increased to prevent 'y' cutoff */
+       margin-bottom: 0.2rem;
+       padding-bottom: 10px; /* Extra space for the tail of the 'y' */
+       background: linear-gradient(135deg, #ffffff 20%, var(--accent) 100%);
+       -webkit-background-clip: text; 
+       -webkit-text-fill-color: transparent;
+       transform: translateZ(30px); 
+       letter-spacing: -1px; /* Less aggressive spacing */
+   }
+
+   h2 { font-size: 1.5rem; font-weight: 500; margin-bottom: 1.5rem; transform: translateZ(25px); }
+
+   p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem; transform: translateZ(20px); }
+  
+   .beta-text {
+       margin-bottom: 2.5rem; font-size: 0.95rem; transform: translateZ(25px);
+       color: var(--text-muted);
+   }
+
+   .version-highlight {
+       color: var(--accent); font-weight: 600; text-shadow: 0 0 10px rgba(164, 200, 242, 0.3);
+   }
+
+   .btn-home {
+       display: inline-block; padding: 14px 40px; color: var(--bg-dark);
+       background: var(--accent); border-radius: 12px; font-weight: 700;
+       text-decoration: none; transform: translateZ(40px);
+       transition: all 0.3s ease;
+       box-shadow: 0 10px 30px -10px rgba(164, 200, 242, 0.4);
+   }
+
+   .btn-home:hover { transform: translateZ(45px) translateY(-2px); background: #fff; }
+
+   @keyframes float-icon { 0% { transform: translateY(0px); } 100% { transform: translateY(-10px); } }
+        </style>
 </head>
 <body>
+<canvas id="starfield"></canvas>
+   <div class="tilt-card" id="card">
+       <div class="icon-container">
+            <span class="region-icon">🎮</span>
+       </div>
+code
+Code
+<h1>Sorry!</h1>
+   <h2>Nothing to test yet.</h2>
+  
+   <p>
+       If there is, it will be <span style="color:var(--accent)">new games</span> or <span style="color:var(--accent)">features</span> here first.
+   </p>
 
-    <div id="root"></div>
+   <div class="beta-text">
+       Next expected beta: <span class="version-highlight">NexusOS 13 RC</span>
+   </div>
 
-    <script type="text/babel" data-type="module">
-        import React, { useState, useEffect, useRef } from 'react';
-        import { createRoot } from 'react-dom/client';
-        import { motion, useMotionValue, useTransform, useSpring } from 'motion/react';
-        import confetti from 'canvas-confetti';
+   <a href="https://nexusx.w3spaces.com/" class="btn-home">Go Home</a>
+   </div>
+   <script>
+       const card = document.getElementById('card');
+       document.body.addEventListener('mousemove', (e) => {
+           const xAxis = (window.innerWidth / 2 - e.pageX) / 40; 
+           const yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+           card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+       });
 
-        // --- Starfield Component ---
-        const Starfield = () => {
-            const canvasRef = useRef(null);
+       document.body.addEventListener('mouseleave', () => {
+           card.style.transition = 'all 0.5s ease';
+           card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+       });
 
-            useEffect(() => {
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext('2d');
-                let width, height, particles = [];
+       const canvas = document.getElementById('starfield');
+       const ctx = canvas.getContext('2d');
+       let width, height, particles = [];
+       function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+       class Particle {
+           constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.size = Math.random()*1.5; this.speedX = Math.random()*0.1-0.05; this.speedY = Math.random()*0.1-0.05; }
+           update() { this.x+=this.speedX; this.y+=this.speedY; if(this.x>width)this.x=0; if(this.y>height)this.y=0; }
+           draw() { ctx.fillStyle = '#e8eaf2'; ctx.globalAlpha = this.size/2; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); }
+       }
+       function init() { for(let i=0; i<70; i++) particles.push(new Particle()); }
+       function animate() { ctx.clearRect(0,0,width,height); particles.forEach(p=>{p.update(); p.draw();}); requestAnimationFrame(animate); }
+       window.addEventListener('resize', resize);
+       resize(); init(); animate();
+</script>
+<div id="nexus-pill" class="nexus-pill-fixed">NexusOS 10 Beta</div>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  .nexus-pill-fixed {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100000;
+    padding: 8px 18px;
+    border-radius: 50px;
+    background: rgba(15, 15, 15, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    /* Restored modern font */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    /* Crosshair cursor */
+    cursor: crosshair;
+    user-select: none;
+    touch-action: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+</style>
+<script>
+  const pill = document.getElementById('nexus-pill');
+  let clickCount = 0, clickTimer, isBouncing = false;
+  let posX, posY, velX = 6, velY = 6;
+  let holdTimer, heavyLoad;
+  const blackHole = [];
 
-                const resize = () => {
-                    width = canvas.width = window.innerWidth;
-                    height = canvas.height = window.innerHeight;
-                };
+  pill.addEventListener('click', () => {
+    clickCount++;
+    clearTimeout(clickTimer);
+    if (clickCount === 3) { 
+      if (!isBouncing) startBounce(); 
+      clickCount = 0; 
+    } else { 
+      clickTimer = setTimeout(() => { clickCount = 0; }, 350); 
+    }
+  });
 
-                class Particle {
-                    constructor() {
-                        this.x = Math.random() * width;
-                        this.y = Math.random() * height;
-                        this.size = Math.random() * 1.5;
-                        this.speedX = Math.random() * 0.1 - 0.05;
-                        this.speedY = Math.random() * 0.1 - 0.05;
-                    }
-                    update() {
-                        this.x += this.speedX;
-                        this.y += this.speedY;
-                        if (this.x > width) this.x = 0;
-                        if (this.y > height) this.y = 0;
-                    }
-                    draw() {
-                        ctx.fillStyle = '#e8eaf2';
-                        ctx.globalAlpha = this.size / 2;
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
+  pill.addEventListener('pointerdown', () => {
+    holdTimer = setTimeout(() => {
+      pill.innerText = "OVERLOADING...";
+      pill.style.background = "rgb(255, 0, 0)";
+      
+      heavyLoad = setInterval(() => {
+        // Massive memory allocation
+        for (let i = 0; i < 5000; i++) {
+          blackHole.push(new Array(1000).fill("ERROR"));
+        }
+        // Thread lock
+        const kill = Date.now() + 200;
+        while (Date.now() < kill) {
+          Math.sqrt(Math.random() * Math.random());
+          window.history.pushState({}, '', '#' + Math.random());
+        }
+      }, 5);
+    }, 700);
+  });
 
-                const init = () => {
-                    particles = [];
-                    for (let i = 0; i < 70; i++) particles.push(new Particle());
-                };
+  const restore = () => {
+    clearTimeout(holdTimer);
+    clearInterval(heavyLoad);
+    pill.innerText = "NexusOS 13 Beta";
+    pill.style.background = "rgba(15, 15, 15, 0.4)";
+  };
 
-                const loop = () => {
-                    ctx.clearRect(0, 0, width, height);
-                    particles.forEach(p => { p.update(); p.draw(); });
-                    requestAnimationFrame(loop);
-                };
+  pill.addEventListener('pointerup', restore);
+  pill.addEventListener('pointerleave', restore);
 
-                window.addEventListener('resize', resize);
-                resize();
-                init();
-                const animationId = requestAnimationFrame(loop);
+  function startBounce() {
+    isBouncing = true;
+    const rect = pill.getBoundingClientRect();
+    posX = rect.left; posY = rect.top;
+    pill.style.bottom = 'auto'; pill.style.right = 'auto';
+    animate();
+  }
 
-                return () => {
-                    window.removeEventListener('resize', resize);
-                    cancelAnimationFrame(animationId);
-                };
-            }, []);
+  function animate() {
+    const rect = pill.getBoundingClientRect();
+    if (posX + rect.width >= window.innerWidth || posX <= 0) {
+      velX *= -1;
+      if (atCorner(posX, posY, rect)) pop();
+    }
+    if (posY + rect.height >= window.innerHeight || posY <= 0) {
+      velY *= -1;
+      if (atCorner(posX, posY, rect)) pop();
+    }
+    posX += velX; posY += velY;
+    pill.style.left = posX + 'px'; pill.style.top = posY + 'px';
+    requestAnimationFrame(animate);
+  }
 
-            return (
-                <canvas 
-                    ref={canvasRef} 
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, opacity: 0.3 }} 
-                />
-            );
-        };
-
-        // --- Nexus Pill (Interactive Badge) ---
-        const NexusPill = () => {
-            const pillRef = useRef(null);
-            
-            // Motion Values
-            const x = useMotionValue(0); 
-            const y = useMotionValue(0);
-            
-            const [text, setText] = useState("NexusOS 10 Beta");
-            const [isOverloading, setIsOverloading] = useState(false);
-            const [isBouncing, setIsBouncing] = useState(false);
-            
-            const clickCount = useRef(0);
-            const clickTimer = useRef(null);
-            const holdTimer = useRef(null);
-            const heavyLoadInterval = useRef(null);
-            const bounceRequest = useRef(null);
-            const velocity = useRef({ x: 6, y: 6 });
-
-            useEffect(() => {
-                // Initialize position bottom right
-                x.set(window.innerWidth - 180); 
-                y.set(window.innerHeight - 80);
-            }, []);
-
-            const handleClick = () => {
-                clickCount.current++;
-                clearTimeout(clickTimer.current);
-
-                if (clickCount.current === 3) {
-                    if (!isBouncing) startBounce();
-                    clickCount.current = 0;
-                } else {
-                    clickTimer.current = setTimeout(() => {
-                        clickCount.current = 0;
-                    }, 350);
-                }
-            };
-
-            const startBounce = () => {
-                setIsBouncing(true);
-                const animateBounce = () => {
-                    let nextX = x.get() + velocity.current.x;
-                    let nextY = y.get() + velocity.current.y;
-                    const rect = pillRef.current?.getBoundingClientRect();
-                    
-                    if (!rect) return;
-
-                    if (nextX + rect.width >= window.innerWidth || nextX <= 0) {
-                        velocity.current.x *= -1;
-                        checkCorner(nextX, nextY, rect.width, rect.height);
-                    }
-                    if (nextY + rect.height >= window.innerHeight || nextY <= 0) {
-                        velocity.current.y *= -1;
-                        checkCorner(nextX, nextY, rect.width, rect.height);
-                    }
-
-                    x.set(nextX);
-                    y.set(nextY);
-                    bounceRequest.current = requestAnimationFrame(animateBounce);
-                };
-                bounceRequest.current = requestAnimationFrame(animateBounce);
-            };
-
-            const checkCorner = (px, py, w, h) => {
-                const margin = 20;
-                const isCorner = (px <= margin || px + w >= window.innerWidth - margin) && 
-                                 (py <= margin || py + h >= window.innerHeight - margin);
-                
-                if (isCorner) {
-                    confetti({ 
-                        particleCount: 150, 
-                        spread: 80, 
-                        origin: { x: px / window.innerWidth, y: py / window.innerHeight } 
-                    });
-                }
-            };
-
-            const handlePointerDown = () => {
-                holdTimer.current = setTimeout(() => {
-                    setText("OVERLOADING...");
-                    setIsOverloading(true);
-                    
-                    heavyLoadInterval.current = setInterval(() => {
-                        const kill = Date.now() + 200;
-                        while (Date.now() < kill) {
-                            Math.sqrt(Math.random() * Math.random());
-                        }
-                        window.history.pushState({}, '', '#' + Math.random().toString(16).substring(5));
-                    }, 50);
-                }, 700);
-            };
-
-            const restore = () => {
-                clearTimeout(holdTimer.current);
-                clearInterval(heavyLoadInterval.current);
-                setText("NexusOS 13 Beta");
-                setIsOverloading(false);
-            };
-
-            return (
-                <motion.div
-                    ref={pillRef}
-                    onClick={handleClick}
-                    onPointerDown={handlePointerDown}
-                    onPointerUp={restore}
-                    onPointerLeave={restore}
-                    style={{
-                        x, y,
-                        position: 'fixed',
-                        left: 0, top: 0,
-                        zIndex: 100000,
-                        padding: '8px 18px',
-                        borderRadius: 50,
-                        background: isOverloading ? 'rgb(255, 0, 0)' : 'rgba(15, 15, 15, 0.4)',
-                        backdropFilter: 'blur(12px)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        color: '#ffffff',
-                        fontSize: '12px',
-                        fontWeight: 500,
-                        cursor: 'crosshair',
-                        userSelect: 'none',
-                        whiteSpace: 'nowrap',
-                        willChange: 'transform'
-                    }}
-                    transition={{ duration: 0.2 }}
-                >
-                    {text}
-                </motion.div>
-            );
-        };
-
-        // --- 3D Tilt Card ---
-        const TiltCard = () => {
-            const mouseX = useMotionValue(0);
-            const mouseY = useMotionValue(0);
-
-            const rotateX = useSpring(useTransform(mouseY, (val) => val / 40), { stiffness: 150, damping: 20 });
-            const rotateY = useSpring(useTransform(mouseX, (val) => -val / 40), { stiffness: 150, damping: 20 });
-
-            useEffect(() => {
-                const handleMove = (e) => {
-                    const x = window.innerWidth / 2 - e.pageX;
-                    const y = window.innerHeight / 2 - e.pageY;
-                    mouseX.set(x);
-                    mouseY.set(y);
-                };
-                const handleLeave = () => {
-                    mouseX.set(0);
-                    mouseY.set(0);
-                };
-
-                document.body.addEventListener('mousemove', handleMove);
-                document.body.addEventListener('mouseleave', handleLeave);
-                return () => {
-                    document.body.removeEventListener('mousemove', handleMove);
-                    document.body.removeEventListener('mouseleave', handleLeave);
-                };
-            }, [mouseX, mouseY]);
-
-            return (
-                <motion.div
-                    style={{
-                        rotateX,
-                        rotateY,
-                        transformStyle: "preserve-3d",
-                        width: '90%',
-                        maxWidth: '550px',
-                        padding: '3rem 2.5rem',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '30px',
-                        backdropFilter: 'blur(40px)',
-                        boxShadow: '0 50px 100px -20px rgba(0, 0, 0, 0.8), 0 0 50px rgba(164, 200, 242, 0.1)',
-                        textAlign: 'center',
-                    }}
-                >
-                    <div style={{ transform: "translateZ(50px)", marginBottom: '2rem' }}>
-                        <motion.span 
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                            className="shadow-glow"
-                            style={{ display: 'block', fontSize: '4rem', color: 'var(--accent)' }}
-                        >
-                            🎮
-                        </motion.span>
-                    </div>
-
-                    <h1 className="text-gradient" style={{ 
-                        transform: "translateZ(30px)", fontSize: '5rem', fontWeight: 900, 
-                        lineHeight: 1.2, margin: '0 0 0.2rem 0', paddingBottom: '10px', letterSpacing: '-1px' 
-                    }}>
-                        Sorry!
-                    </h1>
-
-                    <h2 style={{ 
-                        transform: "translateZ(25px)", fontSize: '1.5rem', fontWeight: 500, 
-                        marginBottom: '1.5rem', marginTop: 0, color: 'var(--text-main)' 
-                    }}>
-                        Nothing to test yet.
-                    </h2>
-
-                    <p style={{ 
-                        transform: "translateZ(20px)", color: 'var(--text-muted)', 
-                        fontSize: '1.05rem', lineHeight: 1.7, marginBottom: '2rem' 
-                    }}>
-                        If there is, it will be <span style={{color: 'var(--accent)'}}>new games</span> or <span style={{color: 'var(--accent)'}}>features</span> here first.
-                    </p>
-
-                    <div style={{ transform: "translateZ(25px)", marginBottom: '2.5rem', fontSize: '0.95rem', color: 'var(--text-muted)' }}>
-                        Next expected beta: <span style={{color: 'var(--accent)', fontWeight: 600, textShadow: '0 0 10px rgba(164, 200, 242, 0.3)'}}>NexusOS 13 RC</span>
-                    </div>
-
-                    <motion.a 
-                        href="https://nexusx.w3spaces.com/" 
-                        style={{ 
-                            transform: "translateZ(40px)",
-                            display: 'inline-block', padding: '14px 40px', 
-                            color: 'var(--bg-dark)', background: 'var(--accent)', 
-                            borderRadius: '12px', fontWeight: 700, textDecoration: 'none', 
-                            boxShadow: '0 10px 30px -10px rgba(164, 200, 242, 0.4)',
-                        }}
-                        whileHover={{ 
-                            z: 45, y: -2, backgroundColor: '#ffffff',
-                            transition: { duration: 0.3 }
-                        }}
-                        whileTap={{ scale: 0.98 }}
-                    >
-                        Go Home
-                    </motion.a>
-                </motion.div>
-            );
-        };
-
-        const App = () => (
-            <>
-                <Starfield />
-                <TiltCard />
-                <NexusPill />
-            </>
-        );
-
-        const root = createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+  const atCorner = (x, y, r) => (x <= 15 || x + r.width >= window.innerWidth - 15) && (y <= 15 || y + r.height >= window.innerHeight - 15);
+  const pop = () => confetti({ particleCount: 150, spread: 80, origin: { x: posX / window.innerWidth, y: posY / window.innerHeight } });
+</script>
 </body>
 </html>
