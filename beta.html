@@ -6,13 +6,17 @@
     <title>Coming Soon - NexusOS</title>
     <meta name="NexusOS" content="NexusX">
     
-    <!-- Import Map for React 19 Canary & Motion 12 -->
+    <!-- 
+      FIXED IMPORT MAP:
+      1. Added ?external=react,react-dom to Motion to prevent it from loading a second React instance.
+      2. Pinned React 19 to ensure compatibility.
+    -->
     <script type="importmap">
     {
         "imports": {
-            "react": "https://esm.sh/react@19?dev",
-            "react-dom/client": "https://esm.sh/react-dom@19/client?dev",
-            "motion/react": "https://esm.sh/motion@12.0.0-alpha.2/react",
+            "react": "https://esm.sh/react@19.0.0-rc-66855b96-20241106?dev",
+            "react-dom/client": "https://esm.sh/react-dom@19.0.0-rc-66855b96-20241106/client?dev",
+            "motion/react": "https://esm.sh/motion@12.0.0-alpha.2/react?external=react,react-dom",
             "canvas-confetti": "https://esm.sh/canvas-confetti@1.9.2"
         }
     }
@@ -70,7 +74,6 @@
     <script type="text/babel" data-type="module">
         import React, { useState, useEffect, useRef } from 'react';
         import { createRoot } from 'react-dom/client';
-        // Motion 12 uses 'motion/react' for React bindings
         import { motion, useMotionValue, useTransform, useSpring } from 'motion/react';
         import confetti from 'canvas-confetti';
 
@@ -145,16 +148,14 @@
         const NexusPill = () => {
             const pillRef = useRef(null);
             
-            // Motion 12 MotionValues
+            // Motion Values
             const x = useMotionValue(0); 
             const y = useMotionValue(0);
             
-            // State
             const [text, setText] = useState("NexusOS 19 Canary");
             const [isOverloading, setIsOverloading] = useState(false);
             const [isBouncing, setIsBouncing] = useState(false);
             
-            // Logic Refs
             const clickCount = useRef(0);
             const clickTimer = useRef(null);
             const holdTimer = useRef(null);
@@ -163,6 +164,7 @@
             const velocity = useRef({ x: 6, y: 6 });
 
             useEffect(() => {
+                // Initialize position
                 x.set(window.innerWidth - 200); 
                 y.set(window.innerHeight - 80);
             }, []);
@@ -190,7 +192,6 @@
                     
                     if (!rect) return;
 
-                    // Screen Collision
                     if (nextX + rect.width >= window.innerWidth || nextX <= 0) {
                         velocity.current.x *= -1;
                         checkCorner(nextX, nextY, rect.width, rect.height);
@@ -226,13 +227,11 @@
                     setText("SYSTEM OVERLOAD");
                     setIsOverloading(true);
                     
-                    // Simulate Thread Blocking (The "Lag")
                     heavyLoadInterval.current = setInterval(() => {
                         const kill = Date.now() + 200;
                         while (Date.now() < kill) {
                             Math.sqrt(Math.random() * Math.random());
                         }
-                        // Noise
                         window.history.replaceState({}, '', '#' + Math.random().toString(16).substring(5));
                     }, 50);
                 }, 800);
@@ -282,7 +281,6 @@
             const mouseX = useMotionValue(0);
             const mouseY = useMotionValue(0);
 
-            // Spring physics for smooth tilt
             const rotateX = useSpring(useTransform(mouseY, (val) => val / 40), { stiffness: 150, damping: 20 });
             const rotateY = useSpring(useTransform(mouseX, (val) => -val / 40), { stiffness: 150, damping: 20 });
 
