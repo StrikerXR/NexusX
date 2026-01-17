@@ -11,7 +11,75 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@17.0.1/lib/marked.umd.js" integrity="sha384-KwzR5her+zXi/Bzz4PVrBjkrjsBZy9adZtt3jA6Jgj3/hzPihRUV6HqMONpTe7Ll" crossorigin="anonymous"></script>
     <!-- LUCIDE ICONS -->
     <script src="https://unpkg.com/lucide@0.562.0/dist/umd/lucide.min.js" integrity="sha384-FmRlymRnpgjuKyAnwH4DftRjl+RqHOlfcw9k4xcpPyovclg/2RZRrvw7qe1koVCP" crossorigin="anonymous"></script>
-    <style>
+    <!-- TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        accent: 'var(--accent)',
+                        'accent-glow': 'var(--accent-glow)',
+                        'bg-base': 'var(--bg-base)',
+                        'glass-bg': 'var(--glass-bg)',
+                        'glass-border': 'var(--glass-border)',
+                        'card-bg': 'var(--card-bg)',
+                        'text-main': 'var(--text-main)',
+                        'text-dim': 'var(--text-dim)',
+                    },
+                    transitionTimingFunction: {
+                        'fluid': 'cubic-bezier(0.25, 1, 0.5, 1)',
+                        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    },
+                    backdropBlur: {
+                        'glass': '16px',
+                    },
+                    animation: {
+                        'bg-spin': 'bgSpin 120s linear infinite',
+                        'orb-pulse': 'orbPulse 10s ease-in-out infinite',
+                        'typing': 'typing 2s steps(7, end)',
+                        'blink': 'blink-caret .75s step-end infinite',
+                        'fadeUp': 'fadeUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards',
+                        'fadeIn': 'fadeIn 1s ease forwards',
+                    },
+                    keyframes: {
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px) scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        bgSpin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                        },
+                        orbPulse: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.6', transform: 'scale(1.2)' },
+                        },
+                        typing: {
+                            'from': { width: '0' },
+                            'to': { width: '100%' }
+                        },
+                        'blink-caret': {
+                            'from, to': { borderColor: 'transparent' },
+                            '50%': { borderColor: 'var(--accent)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- MOTION 12 -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@12.0.0/dist/motion.js"></script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        }
         :root {
             /* --- THEME VARIABLES --- */
             --bg-base: #050505;
@@ -44,611 +112,233 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-font-smoothing: antialiased; outline: none; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            overflow: hidden;
-            height: 100vh; width: 100vw;
-            display: flex; flex-direction: column;
-            transition: color 0.5s, background-color 0.5s;
-        }
-
-        /* --- BACKGROUND --- */
-        #bg-wrapper { position: absolute; inset: 0; z-index: -2; overflow: hidden; background-size: cover; background-position: center; transition: 0.5s; }
-        #bg-default { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: var(--bg-gradient); animation: bgSpin 120s linear infinite; }
-        #bg-orb {
-            position: absolute; top: 50%; left: 50%; width: 800px; height: 800px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            transform: translate(-50%, -50%); filter: blur(80px); opacity: 0.4;
-            animation: orbPulse 10s ease-in-out infinite; pointer-events: none;
-        }
-        @keyframes bgSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes orbPulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } }
-
-        /* --- INTERFACE --- */
-        #main-interface { opacity: 0; pointer-events: none; transition: opacity 0.8s var(--smooth); width: 100%; height: 100%; display: flex; flex-direction: column; }
-        #main-interface.unlocked { opacity: 1; pointer-events: auto; }
-
-        /* --- PILL UI OOBE --- */
-        #oobe-overlay {
-            position: fixed; inset: 0; background: var(--bg-base); z-index: 10000; display: none;
-            align-items: center; justify-content: center; transition: opacity 0.5s var(--smooth);
-            backdrop-filter: blur(20px);
-        }
-        
-        .pill-container {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            width: 480px;
-            max-width: 90%;
-            border-radius: 40px; /* Pill Shape */
-            padding: 40px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column; align-items: center;
-            opacity: 0;
-            transition: opacity 0.5s var(--fluid);
-        }
-        
-        #oobe-overlay.active .pill-container {
-            opacity: 1;
-        }
-
-        .pill-header {
-            font-size: 2rem; font-weight: 800; margin-bottom: 10px;
-            background: linear-gradient(to right, var(--text-main), var(--accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        
-        .pill-header .handwriting {
-            font-family: 'Caveat', cursive;
-            font-size: 3.5rem;
-            line-height: 1;
-            color: var(--text-main);
-            display: inline-block;
-            white-space: nowrap;
-            overflow: hidden;
-            animation: typing 2s steps(7, end), blink-caret .75s step-end infinite;
-            border-right: 3px solid var(--accent);
-            margin-bottom: 10px;
-        }
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--accent); }
-        }
-
-
-        .pill-desc { text-align: center; color: var(--text-dim); margin-bottom: 25px; font-size: 0.9rem; }
-
-        /* --- MODALS --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
-            z-index: 11000; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.4s ease;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-box {
-            background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 32px;
-            padding: 30px; width: 500px; max-width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: scale(0.8) translateY(50px); transition: 0.4s var(--fluid);
-            display: flex; flex-direction: column; max-height: 85vh;
-        }
-        .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-
-        /* Spoof Grid */
-        .spoof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; overflow-y: auto; padding: 5px; width: 100%; }
-        .spoof-item {
-            background: rgba(125,125,125,0.1); border-radius: 16px; padding: 12px; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s var(--fluid); border: 1px solid transparent;
-        }
-        .spoof-item:hover { background: rgba(125,125,125,0.2); transform: scale(1.05); }
-        .spoof-item.selected { border-color: var(--accent); background: var(--accent-glow); }
-        .spoof-icon { width: 32px; height: 32px; border-radius: 6px; }
-        .spoof-name { font-size: 0.7rem; color: var(--text-dim); text-align: center; font-weight: 500; }
-
-        /* --- TOP BAR --- */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; z-index: 50; }
-        .nav-pill {
-            display: flex; gap: 5px; background: var(--glass-bg); padding: 5px;
-            border-radius: 100px; border: 1px solid var(--glass-border); backdrop-filter: var(--glass-blur);
-        }
-        .nav-item {
-            padding: 8px 24px; border-radius: 20px; cursor: pointer; font-weight: 500; font-size: 0.9rem;
-            color: var(--text-dim); transition: 0.3s;
-        }
-        .nav-item:hover { color: var(--text-main); background: rgba(125,125,125,0.1); }
-        .nav-item.active { background: rgba(125,125,125,0.2); color: var(--text-main); }
-
-        /* --- TRAY & CLOCK --- */
-        .system-tray { display: flex; align-items: center; gap: 15px; position: relative; }
-        .tray-item {
-            background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: var(--glass-blur);
-            color: var(--text-main); height: 44px; display: flex; align-items: center; justify-content: center;
-            border-radius: 22px; transition: 0.4s var(--fluid); cursor: pointer;
-        }
-        .tray-item:hover { transform: scale(1.1); background: rgba(125,125,125,0.2); }
-        .clock { padding: 0 20px; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 80px; }
-
-        /* --- NOTIFICATION CENTER --- */
-        #notification-center {
-            position: absolute; top: 60px; right: 0; width: 380px; max-height: 500px;
-            background: var(--card-bg); border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); border-radius: 24px;
-            transform-origin: top right; transform: scale(0.5) translateY(-50px); 
-            opacity: 0; pointer-events: none; transition: 0.5s var(--fluid); z-index: 2000;
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-        #notification-center.active { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
-        
-        .nc-header {
-            padding: 15px 20px; border-bottom: 1px solid var(--glass-border);
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(125,125,125,0.05);
-        }
-        .nc-title { font-weight: 700; font-size: 0.95rem; }
-        
-        .nc-body { 
-            padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; 
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .nc-body::-webkit-scrollbar { display: none; }
-
-        .notif-card {
-            background: rgba(125,125,125,0.05); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 20px; font-size: 0.9rem; line-height: 1.5;
-            color: var(--text-dim); transition: 0.2s;
-        }
-        .notif-card:hover { background: rgba(125,125,125,0.08); }
-        .notif-card h1, .notif-card h2 {
-            color: var(--text-main); font-weight: 700; border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 8px; margin-bottom: 12px;
-        }
-        .notif-card h3 {
-            color: var(--accent); font-weight: 600; font-size: 0.8rem; letter-spacing: 1px;
-            text-transform: uppercase; margin-top: 20px; margin-bottom: 10px;
-        }
-        .notif-card p { margin-bottom: 10px; }
-        .notif-card a { color: var(--accent); text-decoration: none; }
-        .notif-card code { background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
-        .notif-loading { text-align: center; padding: 20px; color: var(--accent); }
-        .notif-card ul { list-style: none; margin-left: 5px; margin-bottom: 15px; }
-        .notif-card li { margin-bottom: 8px; position: relative; padding-left: 20px; }
-        .notif-card li::before { content: '•'; color: var(--accent); position: absolute; left: 0; top: 0; }
-        
-        /* System Alerts in NC */
-        .sys-alert { border-left: 4px solid var(--accent); background: var(--accent-glow); color: white; }
-
-        /* --- TODO & ALARMS --- */
-        #todo-widget {
-            position: absolute; top: 60px; right: 0; width: 340px; background: var(--card-bg);
-            border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-radius: 20px; padding: 20px;
-            transform-origin: top right; transform: scale(0.5) translateY(-50px); opacity: 0; pointer-events: none; transition: 0.5s var(--fluid); z-index: 2000;
-        }
-        #todo-widget.active { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
-        
-        .todo-input-group { display: flex; gap: 8px; margin-bottom: 15px; }
-        .todo-input { flex: 1; background: rgba(125,125,125,0.1); border: none; padding: 8px 12px; border-radius: 8px; color: var(--text-main); font-size: 0.9rem; }
-        /* Time Input */
-        .time-input { width: 90px; background: rgba(125,125,125,0.1); border: none; padding: 8px; border-radius: 8px; color: var(--text-dim); font-size: 0.8rem; cursor: pointer; }
-        .time-input::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.5); cursor: pointer; }
-
-        .todo-list { list-style: none; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .todo-item { 
-            display: flex; align-items: center; padding: 12px; background: rgba(125,125,125,0.05); 
-            border-radius: 12px; border: 1px solid transparent; transition: 0.2s; 
-        }
-        .todo-item:hover { background: rgba(125,125,125,0.1); }
-        .todo-item.overdue { border-color: #ef4444; }
-        
-        .todo-marker { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
-        .todo-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .todo-text {
-            font-size: 0.9rem; color: var(--text-main);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .todo-time { font-size: 0.7rem; color: var(--accent); margin-top: 2px; }
-        
-        .todo-del { color: #ef4444; cursor: pointer; opacity: 0.6; padding: 5px; } 
-        .todo-del:hover { opacity: 1; transform: scale(1.2); }
-
-        /* --- VIEWPORT --- */
-        .view-container { flex: 1; position: relative; width: 100%; display: flex; overflow: hidden; }
-        .content-view {
-            position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: scale(0.96) translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s var(--fluid), visibility 0.4s; display: flex; flex-direction: column;
-        }
-        .content-view.active-view { opacity: 1; visibility: visible; transform: scale(1) translateY(0); z-index: 10; }
-
-        /* --- GAMES HERO --- */
-        #games-view { justify-content: flex-end; padding-bottom: 0; }
-        .hero-area { padding: 0 60px 4vh 60px; max-width: 1200px; margin-bottom: auto; margin-top: 6vh; display: flex; flex-direction: column; justify-content: center; }
-        .hero-title {
-            font-size: clamp(3rem, 7vh, 6rem); font-weight: 800; line-height: 1.0; margin-bottom: 20px;
-            background: linear-gradient(180deg, var(--text-main), var(--text-dim)); -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; opacity: 0; animation: fadeUp 0.8s var(--fluid) forwards 0.3s;
-        }
-        .games-container {
-            width: 100%; height: 52vh; min-height: 320px; background: linear-gradient(to top, var(--bg-base), transparent);
-            backdrop-filter: var(--glass-blur); display: flex; align-items: center; opacity: 0; animation: fadeIn 1s ease forwards 0.6s;
-        }
-        .carousel-track { display: flex; gap: 30px; padding: 0 100px; overflow-x: auto; scroll-behavior: smooth; width: 100%; height: 100%; align-items: center; scrollbar-width: none; }
-        .carousel-track::-webkit-scrollbar { display: none; }
-
-        /* --- GAME CARD --- */
-        .game-card { min-width: 240px; height: 340px; border-radius: 24px; position: relative; cursor: pointer; perspective: 1000px; }
-        .card-inner {
-            width: 100%; height: 100%; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
-            background: var(--card-bg); box-shadow: 0 15px 35px rgba(0,0,0,0.3); transition: transform 0.1s linear; position: relative;
-        }
-        .card-inner img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--fluid), filter 0.5s; filter: brightness(0.8); }
-        .game-card:hover .card-inner { box-shadow: 0 0 30px var(--accent-glow); border-color: rgba(255,255,255,0.3); }
-        .game-card:hover img { transform: scale(1.1); filter: brightness(1); }
-        .card-title {
-            position: absolute; bottom: 20px; left: 20px; font-weight: 700; font-size: 1.2rem; color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.9); opacity: 0; transform: translateY(10px); transition: 0.3s; pointer-events: none;
-        }
-        .game-card:hover .card-title { opacity: 1; transform: translateY(0); }
-
-        .card-del-btn {
-            position: absolute; top: -10px; right: -10px; width: 30px; height: 30px;
-            background: #ef4444; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 14px; opacity: 0; transform: scale(0.5); transition: 0.3s var(--fluid); z-index: 20;
-            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5);
-        }
-        .game-card:hover .card-del-btn { opacity: 1; transform: scale(1); top: -10px; right: -10px; }
-        .card-del-btn:hover { transform: scale(1.2) rotate(90deg); background: #dc2626; }
-
-        .add-tile .card-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(125,125,125,0.05); }
-        .add-icon { font-size: 3rem; color: var(--text-dim); transition: 0.4s var(--fluid); }
-        .add-tile:hover .add-icon { color: var(--accent); transform: scale(1.3); }
-        
-        /* New Badge (Modern & Animated) */
-        .new-badge {
-            position: absolute; top: 12px; right: 12px;
-            background: linear-gradient(45deg, #22c55e, #16a34a);
-            color: #ffffff;
-            font-weight: 700; font-size: 0.7rem; letter-spacing: 0.5px;
-            padding: 6px 12px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
-            z-index: 5;
-            text-transform: uppercase;
-            transform: rotate(10deg) scale(0.9);
-            transform-origin: top right;
-            transition: transform 0.3s var(--fluid);
-        }
-        .game-card:hover .new-badge {
-            transform: rotate(0deg) scale(1);
-        }
-
-        /* --- SETTINGS --- */
-        #settings-view { align-items: center; justify-content: center; background: rgba(0,0,0,0.2); }
-        .settings-box { 
-            width: 700px; max-height: 80vh; padding: 0; 
-            overflow-y: auto; background: var(--card-bg); border-radius: 30px; 
-            border: 1px solid var(--glass-border); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .settings-box::-webkit-scrollbar { display: none; }
-
-        .st-header {
-            padding: 30px 40px; border-bottom: 1px solid rgba(125,125,125,0.1);
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--card-bg); position: sticky; top: 0; z-index: 5;
-        }
-        .st-body { padding: 40px; }
-        
-        .st-group { 
-            background: rgba(125,125,125,0.03); border: 1px solid rgba(125,125,125,0.1); 
-            border-radius: 20px; padding: 20px; margin-bottom: 20px; 
-        }
-        .st-group h3 { 
-            margin-bottom: 15px; color: var(--accent); font-size: 0.75rem; 
-            letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;
-        }
-
-        .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .control-row:last-child { margin-bottom: 0; }
-        
-        .st-input {
-            background: rgba(125,125,125,0.1); border: 1px solid var(--glass-border);
-            color: var(--text-main); padding: 8px 15px; border-radius: 10px; width: 220px;
-        }
-        .switch { position: relative; width: 42px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; inset: 0; background-color: rgba(125,125,125,0.3); transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s var(--fluid); border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent); }
-        input:checked + .slider:before { transform: translateX(18px); }
-
-        .range-slider { width: 100%; -webkit-appearance: none; background: rgba(125,125,125,0.2); height: 6px; border-radius: 3px; }
-        .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: 0.2s; }
-        .range-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
-
         .btn {
-            padding: 10px 20px; border-radius: 12px; font-weight: 600; text-decoration: none;
-            transition: all 0.3s var(--fluid); display: inline-flex; align-items: center; justify-content: center;
-            font-size: 0.9rem; cursor: pointer; border: none;
+            @apply px-5 py-2.5 rounded-xl font-semibold no-underline transition-all duration-300 ease-fluid inline-flex items-center justify-center text-[0.9rem] cursor-pointer border-none;
         }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 20px var(--accent-glow); }
-        .btn-danger { background: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.2); }
-        .btn-danger:hover { background: rgba(220, 38, 38, 0.2); color: #fff; }
-        .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--glass-border); }
-        .btn-ghost:hover { background: rgba(125,125,125,0.1); color: var(--text-main); }
-        
-        .beta-btn {
-            font-size: 0.75rem; padding: 6px 12px; background: rgba(125,125,125,0.15); 
-            color: var(--text-dim); text-decoration: none; border-radius: 8px; border: 1px solid var(--glass-border);
-            transition: 0.2s; display: inline-flex; align-items: center;
-        }
-        .beta-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
-
-        .scroll-arrow {
-            position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border-radius: 50%;
-            background: rgba(125,125,125,0.1); display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 100; transition: 0.3s; backdrop-filter: blur(10px);
-        }
-        .scroll-arrow:hover { background: var(--text-main); color: var(--bg-base); }
-        .scroll-arrow.left { left: 30px; } .scroll-arrow.right { right: 30px; }
-
-        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-        @keyframes fadeUp { from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
-
-        /* --- FLOATING MUSIC WINDOW --- */
-        #music-window {
-            position: absolute; top: 50%; left: 50%; width: 950px; height: 650px;
-            transform: translate(-50%, -50%) scale(0.9); opacity: 0; pointer-events: none;
-            background: #000; border-radius: 30px; overflow: hidden;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px var(--accent-glow);
-            z-index: 9999; display: flex; flex-direction: column; resize: both; min-width: 600px; min-height: 400px;
-            transition: opacity 0.4s ease, transform 0.4s var(--fluid);
-        }
-        #music-window.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-        
-        /* When dragging, remove transition to prevent lag */
-        #music-window.dragging { transition: none; }
-
-        .win-header {
-            height: 40px; background: rgba(46, 52, 64, 0.9);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; cursor: grab; border-bottom: 1px solid var(--accent-glow);
-        }
-        .win-header:active { cursor: grabbing; }
-        .win-title { font-size: 0.8rem; font-weight: 700; color: #eceff4; text-transform: uppercase; letter-spacing: 2px; }
-        .win-close { color: #bf616a; cursor: pointer; font-size: 1.5rem; transition: 0.2s; line-height: 0; }
-        .win-close:hover { color: #ff3b3b; transform: scale(1.2); }
-        
-        .win-content { flex: 1; position: relative; width: 100%; height: 100%; background: #000; }
-        iframe#music-frame { width: 100%; height: 100%; border: none; }
+        .btn-primary { @apply bg-accent text-white hover:-translate-y-[3px] hover:shadow-[0_10px_20px_var(--accent-glow)]; }
+        .btn-danger { @apply bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 hover:text-white; }
+        .btn-ghost { @apply bg-transparent text-text-dim border border-glass-border hover:bg-gray-500/10 hover:text-text-main; }
     </style>
 </head>
-<body>
+<body class="font-['Inter'] bg-bg-base text-text-main overflow-hidden h-screen w-screen flex flex-col transition-colors duration-500">
 
     <!-- OOBE LAYER (Pill UI) -->
-    <div id="oobe-overlay">
-        <div class="pill-container">
-            <div class="pill-header">NexusOS 13</div>
-            <div class="pill-desc">Select a Tab Cloak to begin your session.</div>
+    <div id="oobe-overlay" class="fixed inset-0 bg-bg-base z-[10000] hidden items-center justify-center transition-opacity duration-500 ease-smooth backdrop-blur-[20px]">
+        <div class="pill-container bg-card-bg border border-glass-border w-[480px] max-w-[90%] rounded-[40px] p-10 shadow-[0_30px_60px_rgba(0,0,0,0.5)] flex flex-col items-center opacity-0 transition-opacity duration-500 ease-fluid">
+            <div class="pill-header text-[2rem] font-[800] mb-[10px] bg-gradient-to-r from-text-main to-accent bg-clip-text text-transparent">NexusOS 13</div>
+            <div class="pill-desc text-center text-text-dim mb-[25px] text-[0.9rem]">Select a Tab Cloak to begin your session.</div>
             
             <!-- In-Pill Spoof Grid -->
-            <div class="spoof-grid" id="oobe-spoof-grid" style="max-height: 200px; margin-bottom: 25px;"></div>
+            <div class="spoof-grid max-h-[200px] mb-[25px]" id="oobe-spoof-grid"></div>
             
-            <button class="btn btn-primary" style="width:100%" onclick="OOBE.finish()">Enter System</button>
+            <button class="btn btn-primary w-full" onclick="OOBE.finish()">Enter System</button>
         </div>
     </div>
 
     <!-- SPOOF MODAL (Settings) -->
-    <div id="spoof-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <span class="modal-title">Tab Cloak</span>
-                <button class="btn btn-danger" style="padding:6px 12px;" onclick="Modals.close('spoof-modal')">Close</button>
+    <div id="spoof-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-md z-[11000] flex justify-center items-center opacity-0 pointer-events-none transition-all duration-400 ease-in-out">
+        <div class="modal-box bg-card-bg border border-glass-border rounded-[32px] p-[30px] w-[500px] max-w-[90%] shadow-2xl scale-[0.8] translate-y-[50px] transition-all duration-400 ease-fluid flex flex-col max-h-[85vh]">
+            <div class="modal-header flex justify-between items-center mb-5">
+                <span class="modal-title text-[1.5rem] font-bold text-text-main">Tab Cloak</span>
+                <button class="btn btn-danger py-[6px] px-3" onclick="Modals.close('spoof-modal')">Close</button>
             </div>
             <div class="spoof-grid" id="settings-spoof-grid"></div>
         </div>
     </div>
 
     <!-- ABOUT MODAL -->
-    <div id="about-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <span class="modal-title">About this OS</span>
-                <button class="btn btn-danger" style="padding:6px 12px;" onclick="Modals.close('about-modal')">Close</button>
+    <div id="about-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-md z-[11000] flex justify-center items-center opacity-0 pointer-events-none transition-all duration-400 ease-in-out">
+        <div class="modal-box bg-card-bg border border-glass-border rounded-[32px] p-[30px] w-[500px] max-w-[90%] shadow-2xl scale-[0.8] translate-y-[50px] transition-all duration-400 ease-fluid flex flex-col max-h-[85vh]">
+            <div class="modal-header flex justify-between items-center mb-5">
+                <span class="modal-title text-[1.5rem] font-bold text-text-main">About this OS</span>
+                <button class="btn btn-danger py-[6px] px-3" onclick="Modals.close('about-modal')">Close</button>
             </div>
-            <div class="st-body" style="padding: 0; display: flex; flex-direction: column; gap: 20px;">
-                <div style="text-align: center; padding: 20px;">
-                    <h1 style="font-size: 2.5rem; margin-bottom: 5px;">NexusOS</h1>
-                    <p style="color: var(--accent); font-weight: 700;">Version <span id="about-version"></span></p>
+            <div class="st-body p-0 flex flex-col gap-5">
+                <div class="text-center p-5">
+                    <h1 class="text-[2.5rem] mb-[5px]">NexusOS</h1>
+                    <p class="text-accent font-bold">Version <span id="about-version"></span></p>
                 </div>
 
-                <div class="st-group">
-                    <h3>System Info</h3>
-                    <div class="control-row">
+                <div class="st-group bg-gray-500/5 border border-gray-500/10 rounded-[20px] p-5 mb-5">
+                    <h3 class="mb-[15px] text-accent text-[0.75rem] tracking-[1.5px] uppercase font-bold">System Info</h3>
+                    <div class="control-row flex justify-between items-center mb-3">
                         <span>Security Patch</span>
-                        <span id="about-patch" style="color: var(--text-dim);"></span>
+                        <span id="about-patch" class="text-text-dim"></span>
                     </div>
                 </div>
 
-                <div class="st-group">
-                    <h3>Software Libraries</h3>
-                    <div id="lib-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="st-group bg-gray-500/5 border border-gray-500/10 rounded-[20px] p-5 mb-5">
+                    <h3 class="mb-[15px] text-accent text-[0.75rem] tracking-[1.5px] uppercase font-bold">Software Libraries</h3>
+                    <div id="lib-list" class="flex flex-col gap-2">
                         <!-- Libs will be injected here -->
                     </div>
                 </div>
 
-                <div class="st-group" style="margin-bottom: 0;">
-                    <button class="btn btn-ghost" style="width: 100%;" onclick="Changelog.open(); Modals.close('about-modal');">View Changelog</button>
+                <div class="st-group bg-gray-500/5 border border-gray-500/10 rounded-[20px] p-5 mb-0">
+                    <button class="btn btn-ghost w-full" onclick="Changelog.open(); Modals.close('about-modal');">View Changelog</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ADD APP MODAL -->
-    <div id="add-game-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <span class="modal-title">Add Custom App</span>
-                <button class="btn btn-danger" style="padding:6px 12px;" onclick="Modals.close('add-game-modal')">Cancel</button>
+    <div id="add-game-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-md z-[11000] flex justify-center items-center opacity-0 pointer-events-none transition-all duration-400 ease-in-out">
+        <div class="modal-box bg-card-bg border border-glass-border rounded-[32px] p-[30px] w-[500px] max-w-[90%] shadow-2xl scale-[0.8] translate-y-[50px] transition-all duration-400 ease-fluid flex flex-col max-h-[85vh]">
+            <div class="modal-header flex justify-between items-center mb-5">
+                <span class="modal-title text-[1.5rem] font-bold text-text-main">Add Custom App</span>
+                <button class="btn btn-danger py-[6px] px-3" onclick="Modals.close('add-game-modal')">Cancel</button>
             </div>
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                <input type="text" class="st-input" id="ag-title" placeholder="App Name (e.g., Minecraft)" style="width:100%">
-                <input type="text" class="st-input" id="ag-url" placeholder="URL (e.g., https://game.com)" style="width:100%">
+            <div class="flex flex-col gap-[15px]">
+                <input type="text" class="st-input bg-gray-500/10 border border-glass-border text-text-main py-2 px-[15px] rounded-[10px] w-full" id="ag-title" placeholder="App Name (e.g., Minecraft)">
+                <input type="text" class="st-input bg-gray-500/10 border border-glass-border text-text-main py-2 px-[15px] rounded-[10px] w-full" id="ag-url" placeholder="URL (e.g., https://game.com)">
                 
-                <div style="display:flex; gap:10px; margin-top:5px;">
+                <div class="flex gap-[10px] mt-[5px]">
                     <button class="btn btn-ghost" onclick="AddGame.setType('favicon')" id="btn-fav">Use Favicon</button>
                     <button class="btn btn-ghost" onclick="AddGame.setType('image')" id="btn-img">Custom Image</button>
                 </div>
 
-                <div id="ag-img-input-container" style="display:none; flex-direction:column; gap:10px;">
-                     <input type="text" class="st-input" id="ag-img-url" placeholder="Image URL" style="width:100%">
-                     <div style="text-align:center; font-size:0.8rem; color:var(--text-dim)">OR</div>
-                     <input type="file" id="ag-file" accept="image/*" style="color:var(--text-dim)">
+                <div id="ag-img-input-container" class="hidden flex-col gap-[10px]">
+                     <input type="text" class="st-input bg-gray-500/10 border border-glass-border text-text-main py-2 px-[15px] rounded-[10px] w-full" id="ag-img-url" placeholder="Image URL">
+                     <div class="text-center text-[0.8rem] text-text-dim">OR</div>
+                     <input type="file" id="ag-file" accept="image/*" class="text-text-dim">
                 </div>
-                <button class="btn btn-primary" style="margin-top:10px;" onclick="AddGame.save()">Add to Library</button>
+                <button class="btn btn-primary mt-[10px]" onclick="AddGame.save()">Add to Library</button>
             </div>
         </div>
     </div>
 
     <!-- CHANGELOG MODAL -->
-    <div id="changelog-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <span class="modal-title">Changelog</span>
-                <button class="btn btn-danger" style="padding:6px 12px;" onclick="Modals.close('changelog-modal')">Close</button>
+    <div id="changelog-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-md z-[11000] flex justify-center items-center opacity-0 pointer-events-none transition-all duration-400 ease-in-out">
+        <div class="modal-box bg-card-bg border border-glass-border rounded-[32px] p-[30px] w-[500px] max-w-[90%] shadow-2xl scale-[0.8] translate-y-[50px] transition-all duration-400 ease-fluid flex flex-col max-h-[85vh]">
+            <div class="modal-header flex justify-between items-center mb-5">
+                <span class="modal-title text-[1.5rem] font-bold text-text-main">Changelog</span>
+                <button class="btn btn-danger py-[6px] px-3" onclick="Modals.close('changelog-modal')">Close</button>
             </div>
-            <div class="nc-body" id="changelog-content" style="max-height: 60vh; padding-right: 15px;">
-                <div class="notif-loading">Loading Changelog...</div>
+            <div class="nc-body p-[15px] overflow-y-auto flex flex-col gap-[10px] max-h-[60vh] pr-[15px] scrollbar-hide" id="changelog-content">
+                <div class="notif-loading text-center p-5 text-accent">Loading Changelog...</div>
             </div>
         </div>
     </div>
 
     <!-- BACKGROUND -->
-    <div id="bg-wrapper"><div id="bg-default"></div></div>
-    <div id="bg-orb"></div>
+    <div id="bg-wrapper" class="absolute inset-0 -z-20 overflow-hidden bg-cover bg-center transition-all duration-500"><div id="bg-default" class="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] animate-bg-spin" style="background: var(--bg-gradient);"></div></div>
+    <div id="bg-orb" class="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 blur-[80px] opacity-40 animate-orb-pulse pointer-events-none" style="background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);"></div>
 
     <!-- MAIN INTERFACE -->
-    <div id="main-interface">
-        <div class="top-bar">
-            <div class="nav-pill">
-                <div class="nav-item active" onclick="View.set('games')">Library</div>
-                <div class="nav-item" onclick="View.set('settings')">Settings</div>
+    <div id="main-interface" class="w-full h-full flex flex-col opacity-0 pointer-events-none transition-opacity duration-[0.8s] ease-smooth">
+        <div class="top-bar flex justify-between items-center py-5 px-10 z-50">
+            <div class="nav-pill flex gap-[5px] bg-glass-bg p-[5px] rounded-[100px] border border-glass-border backdrop-blur-glass">
+                <div class="nav-item active py-2 px-6 rounded-[20px] cursor-pointer font-medium text-[0.9rem] text-text-dim transition-all duration-300 hover:text-text-main hover:bg-gray-500/10 [&.active]:bg-gray-500/20 [&.active]:text-text-main" onclick="View.set('games')">Library</div>
+                <div class="nav-item py-2 px-6 rounded-[20px] cursor-pointer font-medium text-[0.9rem] text-text-dim transition-all duration-300 hover:text-text-main hover:bg-gray-500/10 [&.active]:bg-gray-500/20 [&.active]:text-text-main" onclick="View.set('settings')">Settings</div>
             </div>
-            <div class="system-tray">
-                <div class="clock tray-item" id="clock" onclick="Todo.toggle()"></div>
+            <div class="system-tray flex items-center gap-[15px] relative">
+                <div class="clock tray-item bg-glass-bg border border-glass-border backdrop-blur-glass text-text-main h-[44px] flex items-center justify-center rounded-[22px] transition-all duration-400 ease-fluid cursor-pointer px-5 tabular-nums font-semibold min-w-[80px] hover:scale-110 hover:bg-gray-500/20" id="clock" onclick="Todo.toggle()"></div>
                 
                 <!-- MUSIC PLAYER ICON -->
-                <div class="tray-item icon-btn" onclick="MusicApp.toggle()" style="width:44px; padding:0;">
+                <div class="tray-item icon-btn bg-glass-bg border border-glass-border backdrop-blur-glass text-text-main h-[44px] flex items-center justify-center rounded-[22px] transition-all duration-400 ease-fluid cursor-pointer hover:scale-110 hover:bg-gray-500/20 w-[44px] p-0" onclick="MusicApp.toggle()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                 </div>
 
                 <!-- NOTIFICATION ICON -->
-                <div class="tray-item icon-btn" onclick="Notifications.toggle()" style="width:44px; padding:0;">
+                <div class="tray-item icon-btn bg-glass-bg border border-glass-border backdrop-blur-glass text-text-main h-[44px] flex items-center justify-center rounded-[22px] transition-all duration-400 ease-fluid cursor-pointer hover:scale-110 hover:bg-gray-500/20 w-[44px] p-0" onclick="Notifications.toggle()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
                 </div>
 
-                <div class="tray-item icon-btn" onclick="Utils.toggleFull()" style="width:44px; padding:0;">
+                <div class="tray-item icon-btn bg-glass-bg border border-glass-border backdrop-blur-glass text-text-main h-[44px] flex items-center justify-center rounded-[22px] transition-all duration-400 ease-fluid cursor-pointer hover:scale-110 hover:bg-gray-500/20 w-[44px] p-0" onclick="Utils.toggleFull()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                 </div>
 
                 <!-- NOTIFICATION CENTER -->
-                <div id="notification-center">
-                    <div class="nc-header">
-                        <span class="nc-title">Notifications</span>
-                        <button class="btn btn-ghost" style="padding:4px 10px; font-size:0.75rem;" onclick="Notifications.reload()">Refresh</button>
+                <div id="notification-center" class="absolute top-[60px] right-0 w-[380px] max-h-[500px] bg-card-bg border border-glass-border backdrop-blur-md shadow-[0_20px_40px_rgba(0,0,0,0.5)] rounded-[24px] origin-top-right scale-[0.5] -translate-y-[50px] opacity-0 pointer-events-none transition-all duration-500 ease-fluid z-[2000] flex flex-col overflow-hidden">
+                    <div class="nc-header p-[15px_20px] border-b border-glass-border flex justify-between items-center bg-gray-500/5">
+                        <span class="nc-title font-bold text-[0.95rem]">Notifications</span>
+                        <button class="btn btn-ghost py-1 px-[10px] text-[0.75rem]" onclick="Notifications.reload()">Refresh</button>
                     </div>
-                    <div class="nc-body" id="notif-content">
-                        <div class="notif-loading">Loading Updates...</div>
+                    <div class="nc-body p-[15px] overflow-y-auto flex flex-col gap-[10px] scrollbar-hide" id="notif-content">
+                        <div class="notif-loading text-center p-5 text-accent">Loading Updates...</div>
                     </div>
                 </div>
 
                 <!-- TODO WIDGET -->
-                <div id="todo-widget">
-                    <div class="todo-input-group">
-                        <input type="text" class="todo-input" id="todo-input" placeholder="Task..." onkeypress="Todo.handleInput(event)">
-                        <input type="time" class="time-input" id="todo-time" title="Set Alarm">
-                        <button class="btn btn-primary" style="padding:0 12px;" onclick="Todo.add()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                <div id="todo-widget" class="absolute top-[60px] right-0 w-[340px] bg-card-bg border border-glass-border shadow-[0_20px_40px_rgba(0,0,0,0.4)] rounded-[20px] p-5 origin-top-right scale-[0.5] -translate-y-[50px] opacity-0 pointer-events-none transition-all duration-500 ease-fluid z-[2000]">
+                    <div class="todo-input-group flex gap-2 mb-[15px]">
+                        <input type="text" class="todo-input flex-1 bg-gray-500/10 border-none p-[8px_12px] rounded-lg text-text-main text-[0.9rem]" id="todo-input" placeholder="Task..." onkeypress="Todo.handleInput(event)">
+                        <input type="time" class="time-input w-[90px] bg-gray-500/10 border-none p-2 rounded-lg text-text-dim text-[0.8rem] cursor-pointer" id="todo-time" title="Set Alarm">
+                        <button class="btn btn-primary px-3" onclick="Todo.add()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
                     </div>
-                    <ul class="todo-list" id="todo-list"></ul>
+                    <ul class="todo-list list-none max-h-[250px] overflow-y-auto flex flex-col gap-2" id="todo-list"></ul>
                 </div>
             </div>
         </div>
 
-        <div class="view-container">
+        <div class="view-container flex-1 relative w-full flex overflow-hidden">
             <!-- LIBRARY -->
-            <div id="games-view" class="content-view active-view">
-                <div class="hero-area">
-                    <div class="hero-title" id="hero-text">Select App</div>
-                    <div class="hero-actions" style="opacity:0; animation:fadeIn 1s forwards 0.5s;">
-                        <a href="#" target="_blank" id="play-btn" class="btn btn-primary">Launch</a>
+            <div id="games-view" class="content-view active-view absolute inset-0 opacity-0 invisible translate-y-5 scale-[0.96] transition-all duration-400 ease-fluid flex flex-col justify-end pb-0 [&.active-view]:opacity-100 [&.active-view]:visible [&.active-view]:translate-y-0 [&.active-view]:scale-100 [&.active-view]:z-10">
+                <div class="hero-area px-[60px] pb-[4vh] max-w-[1200px] mb-auto mt-[6vh] flex flex-col justify-center">
+                    <div class="hero-title text-[clamp(3rem,7vh,6rem)] font-[800] leading-[1.0] mb-5 bg-gradient-to-b from-text-main to-text-dim bg-clip-text text-transparent opacity-0 animate-[fadeUp_0.8s_ease-fluid_forwards_0.3s]" id="hero-text">Select App</div>
+                    <div class="hero-actions opacity-0 animate-[fadeIn_1s_ease_forwards_0.5s]">
+                        <a href="#" target="_blank" id="play-btn" class="btn btn-primary inline-flex items-center justify-center p-[10px_20px] rounded-xl font-semibold transition-all duration-300 ease-fluid text-[0.9rem] cursor-pointer bg-accent text-white hover:-translate-y-[3px] hover:shadow-[0_10px_20px_var(--accent-glow)]">Launch</a>
                     </div>
                 </div>
-                <div class="games-container">
-                    <div class="scroll-arrow left" onclick="Games.scroll(-1)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></div>
-                    <div class="scroll-arrow right" onclick="Games.scroll(1)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>
-                    <div class="carousel-track" id="card-track"></div>
+                <div class="games-container w-full h-[52vh] min-h-[320px] bg-gradient-to-t from-bg-base to-transparent backdrop-blur-glass flex items-center opacity-0 animate-[fadeIn_1s_ease_forwards_0.6s]">
+                    <div class="scroll-arrow left absolute top-1/2 -translate-y-1/2 w-[50px] h-[50px] rounded-full bg-gray-500/10 flex justify-center items-center cursor-pointer z-[100] transition-all duration-300 backdrop-blur-md left-[30px] hover:bg-text-main hover:text-bg-base" onclick="Games.scroll(-1)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></div>
+                    <div class="scroll-arrow right absolute top-1/2 -translate-y-1/2 w-[50px] h-[50px] rounded-full bg-gray-500/10 flex justify-center items-center cursor-pointer z-[100] transition-all duration-300 backdrop-blur-md right-[30px] hover:bg-text-main hover:text-bg-base" onclick="Games.scroll(1)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>
+                    <div class="carousel-track flex gap-[30px] px-[100px] overflow-x-auto scroll-smooth w-full h-full items-center scrollbar-hide" id="card-track"></div>
                 </div>
             </div>
 
             <!-- SETTINGS -->
-            <div id="settings-view" class="content-view">
-                <div class="settings-box">
-                    <div class="st-header">
-                        <h2>Control Center</h2>
-                        <a href="https://ormsescaperoad.w3spaces.com/beta.html" class="beta-btn">Go to Beta <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px; margin-left:5px;"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+            <div id="settings-view" class="content-view absolute inset-0 opacity-0 invisible translate-y-5 scale-[0.96] transition-all duration-400 ease-fluid flex flex-col items-center justify-center bg-black/20 [&.active-view]:opacity-100 [&.active-view]:visible [&.active-view]:translate-y-0 [&.active-view]:scale-100 [&.active-view]:z-10">
+                <div class="settings-box w-[700px] max-h-[80vh] p-0 overflow-y-auto bg-card-bg rounded-[30px] border border-glass-border shadow-[0_20px_60px_rgba(0,0,0,0.5)] scrollbar-hide">
+                    <div class="st-header p-[30px_40px] border-b border-gray-500/10 flex justify-between items-center bg-card-bg sticky top-0 z-[5]">
+                        <h2 class="text-xl font-bold">Control Center</h2>
+                        <a href="https://ormsescaperoad.w3spaces.com/beta.html" class="beta-btn text-[0.75rem] p-[6px_12px] bg-gray-500/15 text-text-dim rounded-lg border border-glass-border transition-all duration-200 inline-flex items-center hover:bg-accent hover:text-white hover:border-accent">Go to Beta <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 ml-[5px]"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
                     </div>
                     
-                    <div class="st-body">
-                        <div class="st-group">
-                            <h3>Visuals</h3>
-                            <div class="control-row">
+                    <div class="st-body p-10">
+                        <div class="st-group bg-gray-500/5 border border-gray-500/10 rounded-[20px] p-5 mb-5">
+                            <h3 class="mb-[15px] text-accent text-[0.75rem] tracking-[1.5px] uppercase font-bold">Visuals</h3>
+                            <div class="control-row flex justify-between items-center mb-3">
                                 <span>Light Mode</span>
-                                <label class="switch"><input type="checkbox" id="theme-toggle" onchange="Settings.toggleTheme()"><span class="slider"></span></label>
+                                <label class="switch relative w-[42px] h-6"><input type="checkbox" id="theme-toggle" class="opacity-0 w-0 h-0" onchange="Settings.toggleTheme()"><span class="slider absolute inset-0 bg-gray-500/30 transition-all duration-400 rounded-[34px] before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:transition-all before:duration-400 before:ease-fluid before:rounded-full"></span></label>
                             </div>
-                            <div class="control-row">
+                            <div class="control-row flex justify-between items-center mb-3">
                                 <span>Background URL</span>
-                                <input type="text" class="st-input" id="bg-input" placeholder="https://..." onchange="Settings.setBg(this.value)">
+                                <input type="text" class="st-input bg-gray-500/10 border border-glass-border text-text-main p-[8px_15px] rounded-[10px] w-[220px]" id="bg-input" placeholder="https://..." onchange="Settings.setBg(this.value)">
                             </div>
-                            <div class="control-row">
+                            <div class="control-row flex justify-between items-center mb-3">
                                 <span>Tab Cloak</span>
                                 <button class="btn btn-ghost" onclick="Modals.open('spoof-modal')">Change</button>
                             </div>
-                            <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:10px; margin-top:15px;">
-                                <span>3D Tilt Intensity: <span id="tilt-val" style="color:var(--accent)">500</span></span>
-                                <input type="range" min="0" max="1000" value="500" class="range-slider" oninput="Settings.setTilt(this.value)">
+                            <div class="control-row flex flex-col items-start gap-[10px] mt-[15px]">
+                                <span>3D Tilt Intensity: <span id="tilt-val" class="text-accent">500</span></span>
+                                <input type="range" min="0" max="1000" value="500" class="range-slider w-full appearance-none bg-gray-500/20 h-1.5 rounded-[3px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-200 hover:[&::-webkit-slider-thumb]:scale-125" oninput="Settings.setTilt(this.value)">
                             </div>
                         </div>
 
-                        <div class="st-group">
-                            <h3>System</h3>
-                            <div class="control-row">
+                        <div class="st-group bg-gray-500/5 border border-gray-500/10 rounded-[20px] p-5 mb-5">
+                            <h3 class="mb-[15px] text-accent text-[0.75rem] tracking-[1.5px] uppercase font-bold">System</h3>
+                            <div class="control-row flex justify-between items-center mb-3">
                                 <span>24-Hour Time</span>
-                                <label class="switch"><input type="checkbox" id="time-toggle" onchange="Settings.toggleTime()"><span class="slider"></span></label>
+                                <label class="switch relative w-[42px] h-6"><input type="checkbox" id="time-toggle" class="opacity-0 w-0 h-0" onchange="Settings.toggleTime()"><span class="slider absolute inset-0 bg-gray-500/30 transition-all duration-400 rounded-[34px] before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:transition-all before:duration-400 before:ease-fluid before:rounded-full"></span></label>
                             </div>
-                            <div class="control-row">
+                            <div class="control-row flex justify-between items-center mb-3">
                                 <span>Anti-Close</span>
-                                <label class="switch"><input type="checkbox" id="ptc-toggle" onchange="Settings.togglePrevent()"><span class="slider"></span></label>
+                                <label class="switch relative w-[42px] h-6"><input type="checkbox" id="ptc-toggle" class="opacity-0 w-0 h-0" onchange="Settings.togglePrevent()"><span class="slider absolute inset-0 bg-gray-500/30 transition-all duration-400 rounded-[34px] before:absolute before:content-[''] before:h-4 before:w-4 before:left-1 before:bottom-1 before:bg-white before:transition-all before:duration-400 before:ease-fluid before:rounded-full"></span></label>
                             </div>
                         </div>
 
-                        <div class="st-group">
-                            <h3>Data & Reset</h3>
-                            <div class="control-row">
+                        <div class="st-group bg-gray-500/5 border border-gray-500/10 rounded-[20px] p-5 mb-5">
+                            <h3 class="mb-[15px] text-accent text-[0.75rem] tracking-[1.5px] uppercase font-bold">Data & Reset</h3>
+                            <div class="control-row flex justify-between items-center mb-3">
                                 <span>Factory Reset</span>
                                 <button class="btn btn-danger" onclick="OOBE.reset()">Reset</button>
                             </div>
-                            <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="Utils.openBlank()">Launch in about:blank</button>
+                            <button class="btn btn-primary w-full mt-[15px]" onclick="Utils.openBlank()">Launch in about:blank</button>
                         </div>
 
-                        <div style="display:flex; justify-content:center; margin-top: 20px;">
-                            <button class="btn btn-ghost" style="border-radius: 50px; padding: 12px 40px; border-color: var(--accent); color: var(--accent);" onclick="Modals.open('about-modal')">About this OS</button>
+                        <div class="flex justify-center mt-5">
+                            <button class="btn btn-ghost rounded-[50px] p-[12px_40px] border-accent text-accent hover:bg-accent/10" onclick="Modals.open('about-modal')">About this OS</button>
                         </div>
                     </div>
                 </div>
@@ -657,13 +347,13 @@
     </div>
 
     <!-- CUSTOM DRAGGABLE MUSIC WINDOW -->
-    <div id="music-window">
-        <div class="win-header" id="mw-header">
-            <div class="win-title">NexusX Player</div>
-            <div class="win-close" onclick="MusicApp.toggle()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+    <div id="music-window" class="absolute top-1/2 left-1/2 w-[950px] h-[650px] -translate-x-1/2 -translate-y-1/2 scale-[0.9] opacity-0 pointer-events-none bg-black rounded-[30px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.8),0_0_0_1px_var(--accent-glow)] z-[9999] flex flex-col resize min-w-[600px] min-h-[400px] transition-all duration-400 ease-fluid [&.active]:opacity-100 [&.active]:scale-100 [&.active]:pointer-events-auto [&.dragging]:transition-none">
+        <div class="win-header h-10 bg-[#2e3440]/90 flex items-center justify-between px-5 cursor-grab border-b border-accent-glow active:cursor-grabbing" id="mw-header">
+            <div class="win-title text-[0.8rem] font-bold text-[#eceff4] uppercase tracking-[2px]">NexusX Player</div>
+            <div class="win-close text-[#bf616a] cursor-pointer text-[1.5rem] leading-none transition-all duration-200 hover:text-[#ff3b3b] hover:scale-110" onclick="MusicApp.toggle()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
         </div>
-        <div class="win-content">
-            <iframe id="music-frame"></iframe>
+        <div class="win-content flex-1 relative w-full h-full bg-black">
+            <iframe id="music-frame" class="w-full h-full border-none"></iframe>
         </div>
     </div>
 
@@ -1228,8 +918,18 @@ const musicPlayerHTML = `<!DOCTYPE html>
             },
             toggle: () => {
                 const win = document.getElementById('music-window');
-                const isActive = win.classList.toggle('active');
-                if(isActive) MusicApp.init();
+                const isActive = win.classList.contains('active');
+                if(!isActive) {
+                    win.classList.add('active');
+                    win.style.pointerEvents = 'auto';
+                    Motion.animate(win, { opacity: 1, scale: 1 }, { duration: 0.4, easing: [0.25, 1, 0.5, 1] });
+                    MusicApp.init();
+                } else {
+                    Motion.animate(win, { opacity: 0, scale: 0.9 }, { duration: 0.4, easing: [0.25, 1, 0.5, 1] }).finished.then(() => {
+                        win.classList.remove('active');
+                        win.style.pointerEvents = 'none';
+                    });
+                }
             },
             initDraggable: () => {
                 const win = document.getElementById('music-window');
@@ -1272,20 +972,34 @@ const Notifications = {
             loaded: false,
             toggle: () => {
                 const el = document.getElementById('notification-center');
-                const isActive = el.classList.toggle('active');
-                if(isActive && !Notifications.loaded) Notifications.reload();
-                if(isActive) document.getElementById('todo-widget').classList.remove('active');
+                const todo = document.getElementById('todo-widget');
+                const isActive = el.classList.contains('active');
+
+                if(!isActive) {
+                    if (todo.classList.contains('active')) Todo.toggle();
+                    el.classList.add('active');
+                    el.style.pointerEvents = 'auto';
+                    Motion.animate(el, { opacity: 1, scale: 1, y: 0 }, { duration: 0.5, easing: [0.25, 1, 0.5, 1] });
+                    if(!Notifications.loaded) Notifications.reload();
+                } else {
+                    Motion.animate(el, { opacity: 0, scale: 0.5, y: -50 }, { duration: 0.5, easing: [0.25, 1, 0.5, 1] }).finished.then(() => {
+                        el.classList.remove('active');
+                        el.style.pointerEvents = 'none';
+                    });
+                }
             },
             reload: () => {
                 const content = document.getElementById('notif-content');
-                content.innerHTML = '<div class="notif-loading">Checking for updates...</div>';
+                content.innerHTML = '<div class="notif-loading text-center p-5 text-accent">Checking for updates...</div>';
                 
                 const CACHE_KEY = 'nx_notif_cache';
                 const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
 
                 const cachedData = JSON.parse(localStorage.getItem(CACHE_KEY));
+                const cardClass = "notif-card bg-gray-500/5 border border-glass-border rounded-2xl p-5 text-[0.9rem] leading-[1.5] text-text-dim transition-all duration-200 hover:bg-gray-500/10 [&_h1]:text-text-main [&_h1]:font-bold [&_h1]:border-b [&_h1]:border-glass-border [&_h1]:pb-2 [&_h1]:mb-3 [&_h2]:text-text-main [&_h2]:font-bold [&_h2]:border-b [&_h2]:border-glass-border [&_h2]:pb-2 [&_h2]:mb-3 [&_h3]:text-accent [&_h3]:font-semibold [&_h3]:text-[0.8rem] [&_h3]:tracking-wider [&_h3]:uppercase [&_h3]:mt-5 [&_h3]:mb-2.5 [&_p]:mb-2.5 [&_a]:text-accent [&_a]:no-underline [&_code]:bg-black/30 [&_code]:p-[2px_5px] [&_code]:rounded [&_code]:font-mono [&_ul]:list-none [&_ul]:ml-1 [&_ul]:mb-[15px] [&_li]:mb-2 [&_li]:relative [&_li]:pl-5 [&_li]:before:content-['\u2022'] [&_li]:before:text-accent [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-0";
+
                 if (cachedData && (Date.now() - cachedData.timestamp < CACHE_DURATION)) {
-                    content.innerHTML = `<div class="notif-card">${cachedData.html}</div>`;
+                    content.innerHTML = `<div class="${cardClass}">${cachedData.html}</div>`;
                     Notifications.loaded = true;
                     return;
                 }
@@ -1301,16 +1015,16 @@ const Notifications = {
                     })
                     .then(text => {
                         const html = marked.parse(text);
-                        content.innerHTML = `<div class="notif-card">${html}</div>`;
+                        content.innerHTML = `<div class="${cardClass}">${html}</div>`;
                         localStorage.setItem(CACHE_KEY, JSON.stringify({ html, timestamp: Date.now() }));
                         Notifications.loaded = true;
                     })
                     .catch(e => {
                         console.error("Notif Error:", e);
                         if (cachedData) { // Fallback to stale cache on error
-                            content.innerHTML = `<div class="notif-card">${cachedData.html}</div>`;
+                            content.innerHTML = `<div class="${cardClass}">${cachedData.html}</div>`;
                         } else {
-                            content.innerHTML = `<div class="notif-card" style="color:#ef4444">
+                            content.innerHTML = `<div class="${cardClass}" style="color:#ef4444">
                                 <strong>Fetch Error:</strong><br>
                                 Failed to load notifications. This is usually due to temporary proxy downtime or connection issues.
                             </div>`;
@@ -1319,11 +1033,11 @@ const Notifications = {
             },
             pushLocal: (title, msg) => {
                 const content = document.getElementById('notif-content');
-                const alertHtml = `<div class="notif-card sys-alert"><h3>${title}</h3><p>${msg}</p></div>`;
+                const alertHtml = `<div class="notif-card bg-gray-500/5 border border-glass-border rounded-2xl p-5 text-[0.9rem] leading-[1.5] text-text-dim transition-all duration-200 hover:bg-gray-500/10 border-l-4 border-l-accent bg-accent-glow text-white"><h3>${title}</h3><p>${msg}</p></div>`;
                 content.insertAdjacentHTML('afterbegin', alertHtml);
                 
                 const btn = document.querySelector('.system-tray .icon-btn');
-                btn.style.color = '#3b82f6';
+                btn.style.color = 'var(--accent)';
                 setTimeout(() => btn.style.color = '', 4000);
             }
         };
@@ -1337,14 +1051,14 @@ const Notifications = {
                 
                 Games.list.forEach((g, i) => {
                     let card = document.createElement('div');
-                    card.className = "game-card";
+                    card.className = "game-card group min-w-[240px] h-[340px] rounded-[24px] relative cursor-pointer perspective-[1000px]";
                     const isCustom = i >= DefaultGames.length;
                     
                     let html = ``;
-                    if(g.isNew) html += `<div class="new-badge">New</div>`;
-                    if(isCustom) html += `<div class="card-del-btn" onclick="event.stopPropagation(); Games.removeCustom(${i - DefaultGames.length})"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`;
+                    if(g.isNew) html += `<div class="new-badge absolute top-3 right-3 bg-gradient-to-r from-[#22c55e] to-[#16a34a] text-white font-bold text-[0.7rem] tracking-[0.5px] p-[6px_12px] rounded-[10px] shadow-[0_5px_15px_rgba(34,197,94,0.4)] z-[5] uppercase rotate-[10deg] scale-[0.9] origin-top-right transition-all duration-300 ease-fluid group-hover:rotate-0 group-hover:scale-100">New</div>`;
+                    if(isCustom) html += `<div class="card-del-btn absolute -top-2.5 -right-2.5 w-[30px] h-[30px] bg-[#ef4444] color-white rounded-full flex items-center justify-center font-extrabold text-sm opacity-0 scale-50 transition-all duration-300 ease-fluid z-20 shadow-[0_4px_10px_rgba(239,68,68,0.5)] group-hover:opacity-100 group-hover:scale-100 hover:scale-120 hover:rotate-90 hover:bg-[#dc2626]" onclick="event.stopPropagation(); Games.removeCustom(${i - DefaultGames.length})"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`;
 
-                    html += `<div class="card-inner"><img src="${g.image}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
+                    html += `<div class="card-inner w-full h-full rounded-[24px] overflow-hidden border border-white/10 bg-card-bg shadow-[0_15px_35px_rgba(0,0,0,0.3)] transition-transform duration-[0.1s] linear relative group-hover:shadow-[0_0_30px_var(--accent-glow)] group-hover:border-white/30"><img src="${g.image}" class="w-full h-full object-cover transition-all duration-500 ease-fluid brightness-[0.8] group-hover:scale-110 group-hover:brightness-100" loading="lazy"></div><div class="card-title absolute bottom-5 left-5 font-bold text-[1.2rem] text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.9)] opacity-0 translate-y-[10px] transition-all duration-300 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0">${g.title}</div>`;
                     
                     card.innerHTML = html;
                     card.onclick = () => window.open(g.url, '_blank');
@@ -1354,8 +1068,8 @@ const Notifications = {
                 });
 
                 let addTile = document.createElement('div');
-                addTile.className = "game-card add-tile";
-                addTile.innerHTML = `<div class="card-inner"><div class="add-icon"><i data-lucide="plus" style="width:48px; height:48px;"></i></div></div>`;
+                addTile.className = "game-card group min-w-[240px] h-[340px] rounded-[24px] relative cursor-pointer perspective-[1000px] add-tile";
+                addTile.innerHTML = `<div class="card-inner w-full h-full rounded-[24px] overflow-hidden border border-white/10 bg-card-bg shadow-[0_15px_35px_rgba(0,0,0,0.3)] transition-transform duration-[0.1s] linear relative group-hover:shadow-[0_0_30px_var(--accent-glow)] group-hover:border-white/30 flex flex-col items-center justify-center bg-gray-500/5"><div class="add-icon text-[3rem] text-text-dim transition-all duration-400 ease-fluid group-hover:text-accent group-hover:scale-125"><i data-lucide="plus" style="width:48px; height:48px;"></i></div></div>`;
                 addTile.onclick = () => Modals.open('add-game-modal');
                 Games.addTilt(addTile);
                 track.appendChild(addTile);
@@ -1475,8 +1189,20 @@ const Notifications = {
         const Todo = {
             toggle: () => {
                 const el = document.getElementById('todo-widget');
-                const isActive = el.classList.toggle('active');
-                if(isActive) document.getElementById('notification-center').classList.remove('active');
+                const notif = document.getElementById('notification-center');
+                const isActive = el.classList.contains('active');
+
+                if(!isActive) {
+                    if (notif.classList.contains('active')) Notifications.toggle();
+                    el.classList.add('active');
+                    el.style.pointerEvents = 'auto';
+                    Motion.animate(el, { opacity: 1, scale: 1, y: 0 }, { duration: 0.5, easing: [0.25, 1, 0.5, 1] });
+                } else {
+                    Motion.animate(el, { opacity: 0, scale: 0.5, y: -50 }, { duration: 0.5, easing: [0.25, 1, 0.5, 1] }).finished.then(() => {
+                        el.classList.remove('active');
+                        el.style.pointerEvents = 'none';
+                    });
+                }
             },
             handleInput: (e) => { if(e.key==='Enter') Todo.add(); },
             add: () => {
@@ -1516,15 +1242,15 @@ const Notifications = {
                 list.innerHTML = "";
                 State.settings.todos.forEach((item, i) => {
                     let li = document.createElement('li');
-                    li.className = "todo-item";
-                    let timeBadge = item.time ? `<div class="todo-time">⏰ ${item.time}</div>` : '';
+                    li.className = "todo-item flex items-center p-3 bg-gray-500/5 rounded-xl border border-transparent transition-all duration-200 hover:bg-gray-500/10";
+                    let timeBadge = item.time ? `<div class="todo-time text-[0.7rem] text-accent mt-[2px]">⏰ ${item.time}</div>` : '';
                     li.innerHTML = `
-                        <div class="todo-marker" style="background:${item.notified ? '#22c55e' : '#3b82f6'}"></div>
-                        <div class="todo-content">
-                            <span class="todo-text">${item.t}</span>
+                        <div class="todo-marker w-2.5 h-2.5 rounded-full mr-2.5 flex-shrink-0" style="background:${item.notified ? '#22c55e' : 'var(--accent)'}"></div>
+                        <div class="todo-content flex-1 flex flex-col overflow-hidden">
+                            <span class="todo-text text-[0.9rem] text-text-main whitespace-nowrap overflow-hidden text-ellipsis">${item.t}</span>
                             ${timeBadge}
                         </div>
-                        <div class="todo-del" onclick="Todo.remove(${i})"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+                        <div class="todo-del text-[#ef4444] cursor-pointer opacity-60 p-[5px] hover:opacity-100 hover:scale-125" onclick="Todo.remove(${i})"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
                     `;
                     list.appendChild(li);
                 });
@@ -1535,8 +1261,12 @@ const Notifications = {
             type: 'favicon',
             setType: (t) => {
                 AddGame.type = t;
-                document.getElementById('btn-fav').style.background = t === 'favicon' ? 'rgba(59,130,246,0.2)' : 'transparent';
-                document.getElementById('btn-img').style.background = t === 'image' ? 'rgba(59,130,246,0.2)' : 'transparent';
+                const fav = document.getElementById('btn-fav');
+                const img = document.getElementById('btn-img');
+                fav.classList.toggle('bg-accent/20', t === 'favicon');
+                fav.classList.toggle('bg-transparent', t !== 'favicon');
+                img.classList.toggle('bg-accent/20', t === 'image');
+                img.classList.toggle('bg-transparent', t !== 'image');
                 document.getElementById('ag-img-input-container').style.display = t === 'image' ? 'flex' : 'none';
             },
             save: async () => {
@@ -1572,8 +1302,23 @@ const Notifications = {
         };
 
         const Modals = {
-            open: (id) => document.getElementById(id).classList.add('active'),
-            close: (id) => document.getElementById(id).classList.remove('active')
+            open: (id) => {
+                const el = document.getElementById(id);
+                const box = el.querySelector('.modal-box');
+                el.classList.add('active');
+                el.style.pointerEvents = 'auto';
+                Motion.animate(el, { opacity: 1 }, { duration: 0.4 });
+                if (box) Motion.animate(box, { scale: 1, y: 0 }, { duration: 0.4, easing: [0.25, 1, 0.5, 1] });
+            },
+            close: (id) => {
+                const el = document.getElementById(id);
+                const box = el.querySelector('.modal-box');
+                Motion.animate(el, { opacity: 0 }, { duration: 0.4 }).finished.then(() => {
+                    el.classList.remove('active');
+                    el.style.pointerEvents = 'none';
+                });
+                if (box) Motion.animate(box, { scale: 0.8, y: 50 }, { duration: 0.4, easing: [0.25, 1, 0.5, 1] });
+            }
         };
 
         const Changelog = {
@@ -1583,6 +1328,7 @@ const Notifications = {
                 if (Changelog.loaded) return;
 
                 const content = document.getElementById('changelog-content');
+                const cardClass = "notif-card bg-gray-500/5 border border-glass-border rounded-2xl p-5 text-[0.9rem] leading-[1.5] text-text-dim transition-all duration-200 hover:bg-gray-500/10 [&_h1]:text-text-main [&_h1]:font-bold [&_h1]:border-b [&_h1]:border-glass-border [&_h1]:pb-2 [&_h1]:mb-3 [&_h2]:text-text-main [&_h2]:font-bold [&_h2]:border-b [&_h2]:border-glass-border [&_h2]:pb-2 [&_h2]:mb-3 [&_h3]:text-accent [&_h3]:font-semibold [&_h3]:text-[0.8rem] [&_h3]:tracking-wider [&_h3]:uppercase [&_h3]:mt-5 [&_h3]:mb-2.5 [&_p]:mb-2.5 [&_a]:text-accent [&_a]:no-underline [&_code]:bg-black/30 [&_code]:p-[2px_5px] [&_code]:rounded [&_code]:font-mono [&_ul]:list-none [&_ul]:ml-1 [&_ul]:mb-[15px] [&_li]:mb-2 [&_li]:relative [&_li]:pl-5 [&_li]:before:content-['\u2022'] [&_li]:before:text-accent [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-0";
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
                 const targetUrl = 'https://pastebin.com/raw/6zCTDTmj';
 
@@ -1592,12 +1338,12 @@ const Notifications = {
                         return r.text();
                     })
                     .then(text => {
-                        content.innerHTML = `<div class="notif-card">${marked.parse(text)}</div>`;
+                        content.innerHTML = `<div class="${cardClass}">${marked.parse(text)}</div>`;
                         Changelog.loaded = true;
                     })
                     .catch(e => {
                         console.error("Changelog Error:", e);
-                        content.innerHTML = `<div class="notif-card" style="color:#ef4444">
+                        content.innerHTML = `<div class="${cardClass}" style="color:#ef4444">
                             <strong>Fetch Error:</strong><br>
                             Failed to load the changelog.
                         </div>`;
@@ -1614,8 +1360,8 @@ const Notifications = {
                 libList.innerHTML = '';
                 Object.entries(CONFIG.libs).forEach(([name, ver]) => {
                     const row = document.createElement('div');
-                    row.className = 'control-row';
-                    row.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span style="color: var(--text-dim); font-family: monospace;">v${ver}</span>`;
+                    row.className = 'control-row flex justify-between items-center mb-3';
+                    row.innerHTML = `<span>${name.charAt(0).toUpperCase() + name.slice(1)}</span><span class="text-text-dim font-mono text-[0.9rem]">v${ver}</span>`;
                     libList.appendChild(row);
                 });
             }
@@ -1623,12 +1369,25 @@ const Notifications = {
 
         const View = {
             set: (v) => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('.content-view').forEach(c => c.classList.remove('active-view'));
+                const oldView = document.querySelector('.content-view.active-view');
+                const newView = document.getElementById(v+'-view');
                 
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 const idx = v === 'games' ? 0 : 1;
                 document.querySelectorAll('.nav-item')[idx].classList.add('active');
-                document.getElementById(v+'-view').classList.add('active-view');
+
+                if (oldView === newView) return;
+
+                if (oldView) {
+                    Motion.animate(oldView, { opacity: 0, scale: 0.96, y: 20 }, { duration: 0.4, easing: [0.25, 1, 0.5, 1] }).finished.then(() => {
+                        oldView.classList.remove('active-view');
+                        oldView.style.visibility = 'hidden';
+                    });
+                }
+
+                newView.classList.add('active-view');
+                newView.style.visibility = 'visible';
+                Motion.animate(newView, { opacity: 1, scale: 1, y: 0 }, { duration: 0.4, easing: [0.25, 1, 0.5, 1] });
             }
         };
 
@@ -1636,30 +1395,41 @@ const Notifications = {
             init: () => {
                 if(!localStorage.getItem(State.oobeKey)) {
                     const header = document.querySelector('#oobe-overlay .pill-header');
-                    header.innerHTML = '<span class="handwriting">NexusX</span>';
+                    header.innerHTML = '<span class="handwriting inline-block whitespace-nowrap overflow-hidden border-r-[3px] border-r-accent mb-2.5 text-[3.5rem] leading-none animate-typing font-bold font-[\'Caveat\']">NexusX</span>';
 
-                    document.getElementById('oobe-overlay').style.display = 'flex';
+                    const overlay = document.getElementById('oobe-overlay');
+                    overlay.style.display = 'flex';
                     // Render Spoofs in OOBE pill
                     const grid = document.getElementById('oobe-spoof-grid');
+                    const spoofClass = "spoof-item bg-gray-500/10 rounded-2xl p-3 cursor-pointer flex flex-col items-center gap-2 transition-all duration-300 ease-fluid border border-transparent hover:bg-gray-500/20 hover:scale-105 [&.selected]:border-accent [&.selected]:bg-accent-glow";
                     Spoofs.forEach(s => {
-                         let d = document.createElement('div'); d.className = "spoof-item"; d.dataset.id = s.id;
-                         d.innerHTML = `<img src="${s.i}" class="spoof-icon"><div class="spoof-name">${s.t}</div>`;
+                         let d = document.createElement('div'); d.className = spoofClass; d.dataset.id = s.id;
+                         d.innerHTML = `<img src="${s.i}" class="spoof-icon w-8 h-8 rounded-md"><div class="spoof-name text-[0.7rem] text-text-dim text-center font-medium">${s.t}</div>`;
                          d.onclick = () => Settings.setCloak(s.id);
                          grid.appendChild(d);
                     });
                     
-                    setTimeout(() => document.getElementById('oobe-overlay').classList.add('active'), 50);
+                    setTimeout(() => {
+                        overlay.classList.add('active');
+                        Motion.animate(overlay, { opacity: 1 }, { duration: 0.5 });
+                        Motion.animate(overlay.querySelector('.pill-container'), { opacity: 1 }, { duration: 0.5, delay: 0.1 });
+                    }, 50);
                 } else {
-                    document.getElementById('main-interface').classList.add('unlocked');
+                    const main = document.getElementById('main-interface');
+                    main.style.opacity = 1;
+                    main.style.pointerEvents = 'auto';
                 }
             },
             finish: () => {
                 localStorage.setItem(State.oobeKey, 'true');
-                document.getElementById('oobe-overlay').classList.remove('active');
-                setTimeout(() => {
-                    document.getElementById('oobe-overlay').style.display = 'none';
-                    document.getElementById('main-interface').classList.add('unlocked');
-                }, 800);
+                const overlay = document.getElementById('oobe-overlay');
+                Motion.animate(overlay, { opacity: 0 }, { duration: 0.8 }).finished.then(() => {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('active');
+                    const main = document.getElementById('main-interface');
+                    main.style.pointerEvents = 'auto';
+                    Motion.animate(main, { opacity: 1 }, { duration: 0.8 });
+                });
             },
             reset: () => { if(confirm("Reset Everything?")) { localStorage.clear(); location.reload(); } }
         };
@@ -1678,9 +1448,10 @@ const Notifications = {
             
             // Populate Settings Spoof Grid
             const sg = document.getElementById('settings-spoof-grid');
+            const spoofClass = "spoof-item bg-gray-500/10 rounded-2xl p-3 cursor-pointer flex flex-col items-center gap-2 transition-all duration-300 ease-fluid border border-transparent hover:bg-gray-500/20 hover:scale-105 [&.selected]:border-accent [&.selected]:bg-accent-glow";
             Spoofs.forEach(s => {
-                let d = document.createElement('div'); d.className = "spoof-item"; d.dataset.id = s.id;
-                d.innerHTML = `<img src="${s.i}" class="spoof-icon"><div class="spoof-name">${s.t}</div>`;
+                let d = document.createElement('div'); d.className = spoofClass; d.dataset.id = s.id;
+                d.innerHTML = `<img src="${s.i}" class="spoof-icon w-8 h-8 rounded-md"><div class="spoof-name text-[0.7rem] text-text-dim text-center font-medium">${s.t}</div>`;
                 d.onclick = () => Settings.setCloak(s.id);
                 sg.appendChild(d);
             });
