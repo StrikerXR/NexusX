@@ -544,8 +544,10 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('off')">Off</button>
                             <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('subtle')">Subtle</button>
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('balanced')">Balanced</button>
                             <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('normal')">Normal</button>
                             <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('extreme')">Extreme</button>
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('insane')">Insane</button>
                         </div>
                     </div>
 
@@ -553,7 +555,7 @@
                         <h3>Fine Tuning</h3>
                         <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
                             <span>Intensity: <span id="tilt-v-intensity" style="color:var(--accent)">500</span></span>
-                            <input type="range" id="tilt-s-intensity" min="0" max="1000" step="10" class="range-slider" oninput="TiltSettings.update()">
+                            <input type="range" id="tilt-s-intensity" min="0" max="2500" step="10" class="range-slider" oninput="TiltSettings.update()">
                         </div>
                         <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
                             <span>Glare Opacity: <span id="tilt-v-glare" style="color:var(--accent)">0.2</span></span>
@@ -1287,24 +1289,24 @@ const musicPlayerHTML = `<!DOCTYPE html>
         };
 
         const DefaultGames = [
-            { title: "Froggies Arcade", url: "https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/", image: "https://images.unsplash.com/photo-1590005176489-db2e714711fc?q=80&w=1000", isNew: true },
-            { title: "GNMath V2", url: "https://ormsescaperoad.w3spaces.com/gnmath.html", image: "https://images.unsplash.com/photo-1648700231913-ad061d9b3ec9?w=1920", isNew: true },
-            { title: "BitLife", url: "https://ormsescaperoad.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=80&w=1000&auto=format&fit=crop", isNew: true },
-            { title: "Snow Rider 3D", url: "https://ormsescaperoad.w3spaces.com/snow.html", image: "https://plus.unsplash.com/premium_photo-1719930221794-0680e7fd8071", isNew: true },
-            { title: "Oregon Trail", url: "https://oregontrail.ws/the-oregon-trail-game/", image: "https://images.unsplash.com/photo-1533167649158-6d508895b680?q=80&w=1000", isNew: true },
-            { title: "Mesh", url: "https://me.meshcapade.com/editor", image: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1000", isNew: true },
-            { title: "Willway", url: "https://admin.internetspeedtest.world/", image: "https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?q=80&w=1000", isNew: true },
-            { title: "FC Games", url: "https://agreeable-mud-098a6b110.1.azurestaticapps.net/", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000", isNew: true },
-            { title: "Silk", url: "https://ormsescaperoad.w3spaces.com/silk.html", image: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=1000" },
-            { title: "Snake", url: "https://ormsescaperoad.w3spaces.com/snake.html", image: "https://images.unsplash.com/photo-1739869610059-86fabc7bcd7b?fit=clip&w=2500" },
-            { title: "Tetris", url: "https://ormsescaperoad.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?w=1920"},
-            { title: "Hex", url: "https://www.nddb.coop/ccnddb/games/Hexagon Twist/", image: "https://images.unsplash.com/vector-1761047846560-52720ea86a46?w=1920" },
-            { title: "Dino Run", url: "https://ormsescaperoad.w3spaces.com/dino.html", image: "https://images.unsplash.com/vector-1761941086671-a623243d84a3?w=1920" },
-            { title: "Flappy Bird", url: "https://ormsescaperoad.w3spaces.com/bird.html", image: "https://images.unsplash.com/photo-1732198246906-8168ef1ff6bc?q=80&w=1740" },
-            { title: "Drive Mad", url: "https://ormsescaperoad.w3spaces.com/drive-mad.html", image: "https://images.unsplash.com/photo-1763897236977-1baa4a026a6d?q=80&w=2064" },
-            { title: "Bank Heist", url: "https://ormsescaperoad.w3spaces.com/bank.html", image: "https://images.unsplash.com/photo-1738691035045-3fb009e8aa26?fit=clip&w=2500" },
-            { title: "Slither.io", url: "https://ormsescaperoad.w3spaces.com/snakeio.html", image: "https://images.unsplash.com/photo-1736613403120-8d48aebd29e1?fit=clip&w=2500" },
-            { title: "Escape Road", url: "https://ormsescaperoad.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=80&w=774" }, 
+            { title: "Froggies Arcade", url: "https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/", image: "https://images.unsplash.com/photo-1590005176489-db2e714711fc?q=100&w=2500", isNew: true },
+            { title: "GNMath V2", url: "https://ormsescaperoad.w3spaces.com/gnmath.html", image: "https://images.unsplash.com/photo-1648700231913-ad061d9b3ec9?q=100&w=2500", isNew: true },
+            { title: "BitLife", url: "https://ormsescaperoad.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=100&w=2500&auto=format&fit=crop", isNew: true },
+            { title: "Snow Rider 3D", url: "https://ormsescaperoad.w3spaces.com/snow.html", image: "https://images.unsplash.com/photo-1719930221794-0680e7fd8071?q=100&w=2500", isNew: true },
+            { title: "Oregon Trail", url: "https://oregontrail.ws/the-oregon-trail-game/", image: "https://images.unsplash.com/photo-1533167649158-6d508895b680?q=100&w=2500", isNew: true },
+            { title: "Mesh", url: "https://me.meshcapade.com/editor", image: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=100&w=2500", isNew: true },
+            { title: "Willway", url: "https://admin.internetspeedtest.world/", image: "https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?q=100&w=2500", isNew: true },
+            { title: "FC Games", url: "https://agreeable-mud-098a6b110.1.azurestaticapps.net/", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=100&w=2500", isNew: true },
+            { title: "Silk", url: "https://ormsescaperoad.w3spaces.com/silk.html", image: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=100&w=2500" },
+            { title: "Snake", url: "https://ormsescaperoad.w3spaces.com/snake.html", image: "https://images.unsplash.com/photo-1739869610059-86fabc7bcd7b?fit=clip&q=100&w=2500" },
+            { title: "Tetris", url: "https://ormsescaperoad.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?q=100&w=2500"},
+            { title: "Hex", url: "https://www.nddb.coop/ccnddb/games/Hexagon Twist/", image: "https://images.unsplash.com/vector-1761047846560-52720ea86a46?q=100&w=2500" },
+            { title: "Dino Run", url: "https://ormsescaperoad.w3spaces.com/dino.html", image: "https://images.unsplash.com/vector-1761941086671-a623243d84a3?q=100&w=2500" },
+            { title: "Flappy Bird", url: "https://ormsescaperoad.w3spaces.com/bird.html", image: "https://images.unsplash.com/photo-1732198246906-8168ef1ff6bc?q=100&w=2500" },
+            { title: "Drive Mad", url: "https://ormsescaperoad.w3spaces.com/drive-mad.html", image: "https://images.unsplash.com/photo-1763897236977-1baa4a026a6d?q=100&w=2500" },
+            { title: "Bank Heist", url: "https://ormsescaperoad.w3spaces.com/bank.html", image: "https://images.unsplash.com/photo-1738691035045-3fb009e8aa26?fit=clip&q=100&w=2500" },
+            { title: "Slither.io", url: "https://ormsescaperoad.w3spaces.com/snakeio.html", image: "https://images.unsplash.com/photo-1736613403120-8d48aebd29e1?fit=clip&q=100&w=2500" },
+            { title: "Escape Road", url: "https://ormsescaperoad.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=100&w=2500" },
         ];
 
         const Spoofs = [
@@ -1326,6 +1328,65 @@ const musicPlayerHTML = `<!DOCTYPE html>
         ];
 
         /* --- LOGIC --- */
+        const ImageCache = {
+            db: null,
+            init: () => {
+                return new Promise((resolve) => {
+                    const request = indexedDB.open('NexusCache', 1);
+                    request.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('images')) {
+                            db.createObjectStore('images');
+                        }
+                    };
+                    request.onsuccess = (e) => {
+                        ImageCache.db = e.target.result;
+                        resolve();
+                    };
+                    request.onerror = () => resolve();
+                });
+            },
+            get: async (url) => {
+                if (!ImageCache.db) await ImageCache.init();
+                return new Promise((resolve) => {
+                    const tx = ImageCache.db.transaction('images', 'readonly');
+                    const store = tx.objectStore('images');
+                    const request = store.get(url);
+                    request.onsuccess = () => {
+                        if (request.result) {
+                            resolve(URL.createObjectURL(request.result));
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    request.onerror = () => resolve(null);
+                });
+            },
+            set: async (url, blob) => {
+                if (!ImageCache.db) await ImageCache.init();
+                const tx = ImageCache.db.transaction('images', 'readwrite');
+                const store = tx.objectStore('images');
+                store.put(blob, url);
+            },
+            fetchAndCache: async (url) => {
+                // If it's a base64 or already a blob URL, don't cache
+                if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+
+                const cached = await ImageCache.get(url);
+                if (cached) return cached;
+
+                try {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    await ImageCache.set(url, blob);
+                    return URL.createObjectURL(blob);
+                } catch (e) {
+                    console.error("Cache Error:", e);
+                    return url;
+                }
+            }
+        };
+
         const Utils = {
             toggleFull: () => !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen(),
             openBlank: () => {
@@ -1496,12 +1557,13 @@ const Notifications = {
 
         const Games = {
             list: [],
-            render: () => {
+            render: async () => {
                 const track = document.getElementById('card-track');
                 track.innerHTML = "";
                 Games.list = [...DefaultGames, ...State.settings.customGames];
                 
-                Games.list.forEach((g, i) => {
+                for (let i = 0; i < Games.list.length; i++) {
+                    const g = Games.list[i];
                     let card = document.createElement('div');
                     card.className = "game-card";
                     const isCustom = i >= DefaultGames.length;
@@ -1510,7 +1572,9 @@ const Notifications = {
                     if(g.isNew) html += `<div class="new-badge">New</div>`;
                     if(isCustom) html += `<div class="card-del-btn" onclick="event.stopPropagation(); Games.removeCustom(${i - DefaultGames.length})"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`;
 
-                    html += `<div class="card-inner"><img src="${g.image}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
+                    // Try to get cached image
+                    const displayImage = await ImageCache.fetchAndCache(g.image);
+                    html += `<div class="card-inner"><img src="${displayImage}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
                     
                     card.innerHTML = html;
                     card.onclick = () => window.open(g.url, '_blank');
@@ -1523,7 +1587,7 @@ const Notifications = {
                         delay: i * 0.05,
                         type: "spring", stiffness: 200, damping: 20
                     });
-                });
+                }
 
                 let addTile = document.createElement('div');
                 addTile.className = "game-card add-tile";
@@ -1921,8 +1985,10 @@ const Notifications = {
             presets: {
                 off: { intensity: 0, glare: 0, perspective: 1000, scale: 1, enabled: false },
                 subtle: { intensity: 200, glare: 0.1, perspective: 1500, scale: 1.02, enabled: true },
+                balanced: { intensity: 350, glare: 0.15, perspective: 1200, scale: 1.03, enabled: true },
                 normal: { intensity: 500, glare: 0.2, perspective: 1000, scale: 1.05, enabled: true },
-                extreme: { intensity: 1000, glare: 0.4, perspective: 800, scale: 1.1, enabled: true }
+                extreme: { intensity: 1000, glare: 0.4, perspective: 800, scale: 1.1, enabled: true },
+                insane: { intensity: 2000, glare: 0.6, perspective: 600, scale: 1.2, enabled: true }
             },
             open: () => {
                 const cfg = State.settings.tilt;
@@ -1971,14 +2037,16 @@ const Notifications = {
 
                 TiltSettings.update();
             },
-            renderPreview: () => {
+            renderPreview: async () => {
                 const container = document.getElementById('tilt-preview-container');
                 container.innerHTML = '';
                 const card = document.createElement('div');
                 card.className = 'game-card';
                 card.style.minWidth = '200px';
                 card.style.height = '280px';
-                card.innerHTML = `<div class="card-inner"><img src="https://images.unsplash.com/photo-1768185595034-69de2bfe7848"></div><div class="card-title">EXAMPLE</div>`;
+                const highResImg = "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=100&w=2500";
+                const displayImage = await ImageCache.fetchAndCache(highResImg);
+                card.innerHTML = `<div class="card-inner"><img src="${displayImage}"></div><div class="card-title">EXAMPLE</div>`;
                 Games.addTilt(card);
                 container.appendChild(card);
 
