@@ -171,6 +171,8 @@
             padding: 8px 24px; border-radius: 100px; cursor: pointer; font-weight: 500; font-size: 0.9rem;
             color: var(--text-dim); transition: color 0.3s;
             position: relative; z-index: 1;
+            display: flex; align-items: center; justify-content: center;
+            line-height: 1;
         }
         .nav-item:hover { color: var(--text-main); }
         .nav-item.active { color: var(--text-main); }
@@ -182,7 +184,6 @@
             color: var(--text-main); height: 44px; display: flex; align-items: center; justify-content: center;
             border-radius: 22px; transition: 0.4s var(--fluid); cursor: pointer;
         }
-        .tray-item:hover { transform: scale(1.1); background: rgba(125,125,125,0.2); }
         .clock { padding: 0 20px; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 80px; }
 
         /* --- NOTIFICATION CENTER --- */
@@ -297,7 +298,7 @@
         .view-container { flex: 1; position: relative; width: 100%; display: flex; overflow: hidden; }
         .content-view {
             position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: scale(0.96) translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s var(--fluid), visibility 0.4s; display: flex; flex-direction: column;
+            display: flex; flex-direction: column;
         }
         .content-view.active-view { opacity: 1; visibility: visible; transform: scale(1) translateY(0); z-index: 10; }
 
@@ -305,9 +306,10 @@
         #games-view { justify-content: flex-end; padding-bottom: 0; }
         .hero-area { padding: 0 60px 4vh 60px; max-width: 1200px; margin-bottom: auto; margin-top: 6vh; display: flex; flex-direction: column; justify-content: center; }
         .hero-title {
-            font-size: clamp(3rem, 7vh, 6rem); font-weight: 800; line-height: 1.0; margin-bottom: 20px;
+            font-size: clamp(3rem, 7vh, 6rem); font-weight: 800; line-height: 1.2; margin-bottom: 20px;
             background: linear-gradient(180deg, var(--text-main), var(--text-dim)); -webkit-background-clip: text;
             -webkit-text-fill-color: transparent; opacity: 0; animation: fadeUp 0.8s var(--fluid) forwards 0.3s;
+            padding: 10px 0;
         }
         .games-container {
             width: 100%; height: 52vh; min-height: 320px; background: linear-gradient(to top, var(--bg-base), transparent);
@@ -1458,6 +1460,12 @@ const Notifications = {
                     card.onmouseenter = () => Games.hero(i);
                     Games.addTilt(card);
                     track.appendChild(card);
+
+                    // Staggered Animation
+                    Motion.animate(card, { opacity: [0, 1], y: [40, 0], scale: [0.8, 1] }, {
+                        delay: i * 0.05,
+                        type: "spring", stiffness: 200, damping: 20
+                    });
                 });
 
                 let addTile = document.createElement('div');
@@ -1466,6 +1474,11 @@ const Notifications = {
                 addTile.onclick = () => Modals.open('add-game-modal');
                 Games.addTilt(addTile);
                 track.appendChild(addTile);
+
+                Motion.animate(addTile, { opacity: [0, 1], y: [40, 0], scale: [0.8, 1] }, {
+                    delay: Games.list.length * 0.05,
+                    type: "spring", stiffness: 200, damping: 20
+                });
 
                 Games.hero(0);
             },
@@ -1488,24 +1501,56 @@ const Notifications = {
                 }
             },
             addTilt: (card) => {
+                const inner = card.querySelector('.card-inner');
+
+                // Add glare element if it doesn't exist
+                if (!inner.querySelector('.glare')) {
+                    const glare = document.createElement('div');
+                    glare.className = 'glare';
+                    glare.style.cssText = `
+                        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                        pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 80%);
+                        opacity: 0; transition: opacity 0.4s var(--smooth); z-index: 10;
+                    `;
+                    inner.appendChild(glare);
+                }
+                const glare = inner.querySelector('.glare');
+
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
-                    const tiltFactor = State.settings.tilt / 1000;
-                    const maxRot = 25;
+                    const tiltFactor = State.settings.tilt / 500; // Normalized around 500
+                    const maxRot = 20 * tiltFactor;
+                    const perspective = 1000;
+                    const scale = 1.05;
 
-                    const x = (e.clientX - rect.left - rect.width/2) / (rect.width/2);
-                    const y = -(e.clientY - rect.top - rect.height/2) / (rect.height/2);
+                    const x = (e.clientX - rect.left) / rect.width; // 0 to 1
+                    const y = (e.clientY - rect.top) / rect.height; // 0 to 1
                     
-                    const rotX = y * maxRot * tiltFactor;
-                    const rotY = x * maxRot * tiltFactor;
+                    const rotX = (0.5 - y) * maxRot;
+                    const rotY = (x - 0.5) * maxRot;
 
-                    card.querySelector('.card-inner').style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+                    inner.style.transition = 'transform 0.1s ease-out';
+                    inner.style.transform = `perspective(${perspective}px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(${scale}, ${scale}, ${scale})`;
+
+                    glare.style.opacity = '1';
+                    glare.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,0.2) 0%, transparent 80%)`;
                 });
+
                 card.addEventListener('mouseleave', () => {
-                    card.querySelector('.card-inner').style.transform = `rotateX(0) rotateY(0)`;
+                    inner.style.transition = 'transform 0.5s var(--fluid)';
+                    inner.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    glare.style.opacity = '0';
                 });
             },
-            scroll: (d) => document.getElementById('card-track').scrollBy({ left: d * 320, behavior: 'smooth' })
+            scroll: (d) => {
+                const track = document.getElementById('card-track');
+                const start = track.scrollLeft;
+                const end = start + (d * 320);
+
+                Motion.animate((progress) => {
+                    track.scrollLeft = start + (end - start) * progress;
+                }, { duration: 0.6, easing: [0.25, 1, 0.5, 1] });
+            }
         };
 
         const Settings = {
@@ -1523,6 +1568,7 @@ const Notifications = {
             },
             toggleTheme: () => {
                 State.settings.lightMode = !State.settings.lightMode;
+                Motion.animate(document.body, { opacity: [0.8, 1] }, { duration: 0.3 });
                 document.body.classList.toggle('light-mode', State.settings.lightMode);
                 Settings.save('nx_light', State.settings.lightMode);
             },
@@ -1844,7 +1890,20 @@ const Notifications = {
                 const idx = v === 'games' ? 0 : 1;
                 const activeItem = items[idx];
                 activeItem.classList.add('active');
-                document.getElementById(v+'-view').classList.add('active-view');
+
+                const viewEl = document.getElementById(v+'-view');
+                viewEl.classList.add('active-view');
+
+                if (!instant) {
+                    Motion.animate(viewEl, {
+                        opacity: [0, 1],
+                        scale: [0.96, 1],
+                        y: [20, 0]
+                    }, {
+                        duration: 0.5,
+                        easing: [0.25, 1, 0.5, 1]
+                    });
+                }
 
                 // Move Indicator
                 const indicator = document.getElementById('nav-indicator');
@@ -1931,6 +1990,16 @@ const Notifications = {
 
             // Init Lucide
             lucide.createIcons();
+
+            // Tray Hover Effects with Motion
+            document.querySelectorAll('.tray-item').forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    Motion.animate(item, { scale: 1.15, y: -2 }, { type: "spring", stiffness: 400, damping: 15 });
+                });
+                item.addEventListener('mouseleave', () => {
+                    Motion.animate(item, { scale: 1, y: 0 }, { type: "spring", stiffness: 400, damping: 15 });
+                });
+            });
         };
         
         window.addEventListener('beforeunload', (e) => {
