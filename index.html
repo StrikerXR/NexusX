@@ -171,6 +171,8 @@
             padding: 8px 24px; border-radius: 100px; cursor: pointer; font-weight: 500; font-size: 0.9rem;
             color: var(--text-dim); transition: color 0.3s;
             position: relative; z-index: 1;
+            display: flex; align-items: center; justify-content: center;
+            line-height: 1;
         }
         .nav-item:hover { color: var(--text-main); }
         .nav-item.active { color: var(--text-main); }
@@ -182,7 +184,6 @@
             color: var(--text-main); height: 44px; display: flex; align-items: center; justify-content: center;
             border-radius: 22px; transition: 0.4s var(--fluid); cursor: pointer;
         }
-        .tray-item:hover { transform: scale(1.1); background: rgba(125,125,125,0.2); }
         .clock { padding: 0 20px; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 80px; }
 
         /* --- NOTIFICATION CENTER --- */
@@ -297,7 +298,7 @@
         .view-container { flex: 1; position: relative; width: 100%; display: flex; overflow: hidden; }
         .content-view {
             position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: scale(0.96) translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s var(--fluid), visibility 0.4s; display: flex; flex-direction: column;
+            display: flex; flex-direction: column;
         }
         .content-view.active-view { opacity: 1; visibility: visible; transform: scale(1) translateY(0); z-index: 10; }
 
@@ -305,9 +306,10 @@
         #games-view { justify-content: flex-end; padding-bottom: 0; }
         .hero-area { padding: 0 60px 4vh 60px; max-width: 1200px; margin-bottom: auto; margin-top: 6vh; display: flex; flex-direction: column; justify-content: center; }
         .hero-title {
-            font-size: clamp(3rem, 7vh, 6rem); font-weight: 800; line-height: 1.0; margin-bottom: 20px;
+            font-size: clamp(3rem, 7vh, 6rem); font-weight: 800; line-height: 1.2; margin-bottom: 20px;
             background: linear-gradient(180deg, var(--text-main), var(--text-dim)); -webkit-background-clip: text;
             -webkit-text-fill-color: transparent; opacity: 0; animation: fadeUp 0.8s var(--fluid) forwards 0.3s;
+            padding: 10px 0;
         }
         .games-container {
             width: 100%; height: 52vh; min-height: 320px; background: linear-gradient(to top, var(--bg-base), transparent);
@@ -317,10 +319,11 @@
         .carousel-track::-webkit-scrollbar { display: none; }
 
         /* --- GAME CARD --- */
-        .game-card { min-width: 240px; height: 340px; border-radius: 24px; position: relative; cursor: pointer; perspective: 1000px; }
+        .game-card { min-width: 240px; height: 340px; border-radius: 24px; position: relative; cursor: pointer; perspective: 1000px; will-change: transform; }
         .card-inner {
             width: 100%; height: 100%; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
             background: var(--card-bg); box-shadow: 0 15px 35px rgba(0,0,0,0.3); transition: transform 0.1s linear; position: relative;
+            backface-visibility: hidden; transform-style: preserve-3d;
         }
         .card-inner img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--fluid), filter 0.5s; filter: brightness(0.8); }
         .game-card:hover .card-inner { box-shadow: 0 0 30px var(--accent-glow); border-color: rgba(255,255,255,0.3); }
@@ -526,6 +529,58 @@
         </div>
     </div>
 
+    <!-- TILT SETTINGS MODAL -->
+    <div id="tilt-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 800px; max-width: 95%;">
+            <div class="modal-header">
+                <span class="modal-title">3D Tilt Customization</span>
+                <button class="btn btn-danger" style="padding:6px 12px;" onclick="Modals.close('tilt-modal')">Close</button>
+            </div>
+            <div style="display: flex; gap: 30px; height: 100%; overflow: hidden;">
+                <!-- Left: Controls -->
+                <div style="flex: 1; overflow-y: auto; padding-right: 10px;">
+                    <div class="st-group">
+                        <h3>Presets</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('off')">Off</button>
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('subtle')">Subtle</button>
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('balanced')">Balanced</button>
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('normal')">Normal</button>
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('extreme')">Extreme</button>
+                            <button class="btn btn-ghost" onclick="TiltSettings.applyPreset('insane')">Insane</button>
+                        </div>
+                    </div>
+
+                    <div class="st-group">
+                        <h3>Fine Tuning</h3>
+                        <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
+                            <span>Intensity: <span id="tilt-v-intensity" style="color:var(--accent)">500</span></span>
+                            <input type="range" id="tilt-s-intensity" min="0" max="2500" step="10" class="range-slider" oninput="TiltSettings.update()">
+                        </div>
+                        <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
+                            <span>Glare Opacity: <span id="tilt-v-glare" style="color:var(--accent)">0.2</span></span>
+                            <input type="range" id="tilt-s-glare" min="0" max="1" step="0.05" class="range-slider" oninput="TiltSettings.update()">
+                        </div>
+                        <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
+                            <span>Perspective: <span id="tilt-v-persp" style="color:var(--accent)">1000</span></span>
+                            <input type="range" id="tilt-s-persp" min="500" max="2000" step="50" class="range-slider" oninput="TiltSettings.update()">
+                        </div>
+                        <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
+                            <span>Hover Scale: <span id="tilt-v-scale" style="color:var(--accent)">1.05</span></span>
+                            <input type="range" id="tilt-s-scale" min="1" max="1.2" step="0.01" class="range-slider" oninput="TiltSettings.update()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Preview -->
+                <div style="width: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
+                    <span style="font-weight: 700; color: var(--text-dim);">Live Preview</span>
+                    <div id="tilt-preview-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SECURITY NOTES MODAL -->
     <div id="security-notes-modal" class="modal-overlay">
         <div class="modal-box">
@@ -685,9 +740,9 @@
                                 <span>Tab Cloak</span>
                                 <button class="btn btn-ghost" onclick="Modals.open('spoof-modal')">Change</button>
                             </div>
-                            <div class="control-row" style="flex-direction:column; align-items:flex-start; gap:10px; margin-top:15px;">
-                                <span>3D Tilt Intensity: <span id="tilt-val" style="color:var(--accent)">500</span></span>
-                                <input type="range" min="0" max="1000" value="500" class="range-slider" oninput="Settings.setTilt(this.value)">
+                            <div class="control-row">
+                                <span>3D Tilt FX</span>
+                                <button class="btn btn-ghost" onclick="TiltSettings.open()">Configure Tilt...</button>
                             </div>
                         </div>
 
@@ -1222,30 +1277,36 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 bg: localStorage.getItem('nx_bg') || '',
                 todos: JSON.parse(localStorage.getItem('nx_todos') || '[]'),
                 lightMode: localStorage.getItem('nx_light') === 'true',
-                tilt: parseInt(localStorage.getItem('nx_tilt') || '500'),
+                tilt: {
+                    intensity: parseInt(localStorage.getItem('nx_tilt_intensity') || '500'),
+                    glare: parseFloat(localStorage.getItem('nx_tilt_glare') || '0.2'),
+                    perspective: parseInt(localStorage.getItem('nx_tilt_persp') || '1000'),
+                    scale: parseFloat(localStorage.getItem('nx_tilt_scale') || '1.05'),
+                    enabled: localStorage.getItem('nx_tilt_enabled') !== 'false'
+                },
                 customGames: JSON.parse(localStorage.getItem('nx_custom_games') || '[]')
             }
         };
 
         const DefaultGames = [
-            { title: "Froggies Arcade", url: "https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/", image: "https://images.unsplash.com/photo-1590005176489-db2e714711fc?q=80&w=1000", isNew: true },
-            { title: "GNMath V2", url: "https://ormsescaperoad.w3spaces.com/gnmath.html", image: "https://images.unsplash.com/photo-1648700231913-ad061d9b3ec9?w=1920", isNew: true },
-            { title: "BitLife", url: "https://ormsescaperoad.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=80&w=1000&auto=format&fit=crop", isNew: true },
-            { title: "Snow Rider 3D", url: "https://ormsescaperoad.w3spaces.com/snow.html", image: "https://plus.unsplash.com/premium_photo-1719930221794-0680e7fd8071", isNew: true },
-            { title: "Oregon Trail", url: "https://oregontrail.ws/the-oregon-trail-game/", image: "https://images.unsplash.com/photo-1533167649158-6d508895b680?q=80&w=1000", isNew: true },
-            { title: "Mesh", url: "https://me.meshcapade.com/editor", image: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1000", isNew: true },
-            { title: "Willway", url: "https://admin.internetspeedtest.world/", image: "https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?q=80&w=1000", isNew: true },
-            { title: "FC Games", url: "https://agreeable-mud-098a6b110.1.azurestaticapps.net/", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000", isNew: true },
-            { title: "Silk", url: "https://ormsescaperoad.w3spaces.com/silk.html", image: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=1000" },
-            { title: "Snake", url: "https://ormsescaperoad.w3spaces.com/snake.html", image: "https://images.unsplash.com/photo-1739869610059-86fabc7bcd7b?fit=clip&w=2500" },
-            { title: "Tetris", url: "https://ormsescaperoad.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?w=1920"},
-            { title: "Hex", url: "https://www.nddb.coop/ccnddb/games/Hexagon Twist/", image: "https://images.unsplash.com/vector-1761047846560-52720ea86a46?w=1920" },
-            { title: "Dino Run", url: "https://ormsescaperoad.w3spaces.com/dino.html", image: "https://images.unsplash.com/vector-1761941086671-a623243d84a3?w=1920" },
-            { title: "Flappy Bird", url: "https://ormsescaperoad.w3spaces.com/bird.html", image: "https://images.unsplash.com/photo-1732198246906-8168ef1ff6bc?q=80&w=1740" },
-            { title: "Drive Mad", url: "https://ormsescaperoad.w3spaces.com/drive-mad.html", image: "https://images.unsplash.com/photo-1763897236977-1baa4a026a6d?q=80&w=2064" },
-            { title: "Bank Heist", url: "https://ormsescaperoad.w3spaces.com/bank.html", image: "https://images.unsplash.com/photo-1738691035045-3fb009e8aa26?fit=clip&w=2500" },
-            { title: "Slither.io", url: "https://ormsescaperoad.w3spaces.com/snakeio.html", image: "https://images.unsplash.com/photo-1736613403120-8d48aebd29e1?fit=clip&w=2500" },
-            { title: "Escape Road", url: "https://ormsescaperoad.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=80&w=774" }, 
+            { title: "Froggies Arcade", url: "https://frogs.look.good.pxi-fusion.com.cdn.cloudflare.net/math/", image: "https://images.unsplash.com/photo-1590005176489-db2e714711fc?q=100&w=2500", isNew: true },
+            { title: "GNMath V2", url: "https://ormsescaperoad.w3spaces.com/gnmath.html", image: "https://images.unsplash.com/photo-1648700231913-ad061d9b3ec9?q=100&w=2500", isNew: true },
+            { title: "BitLife", url: "https://ormsescaperoad.w3spaces.com/bitlife.html", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?q=100&w=2500&auto=format&fit=crop", isNew: true },
+            { title: "Snow Rider 3D", url: "https://ormsescaperoad.w3spaces.com/snow.html", image: "https://images.unsplash.com/photo-1719930221794-0680e7fd8071?q=100&w=2500", isNew: true },
+            { title: "Oregon Trail", url: "https://oregontrail.ws/the-oregon-trail-game/", image: "https://images.unsplash.com/photo-1533167649158-6d508895b680?q=100&w=2500", isNew: true },
+            { title: "Mesh", url: "https://me.meshcapade.com/editor", image: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=100&w=2500", isNew: true },
+            { title: "Willway", url: "https://admin.internetspeedtest.world/", image: "https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?q=100&w=2500", isNew: true },
+            { title: "FC Games", url: "https://agreeable-mud-098a6b110.1.azurestaticapps.net/", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=100&w=2500", isNew: true },
+            { title: "Silk", url: "https://ormsescaperoad.w3spaces.com/silk.html", image: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=100&w=2500" },
+            { title: "Snake", url: "https://ormsescaperoad.w3spaces.com/snake.html", image: "https://images.unsplash.com/photo-1739869610059-86fabc7bcd7b?fit=clip&q=100&w=2500" },
+            { title: "Tetris", url: "https://ormsescaperoad.w3spaces.com/tetris.html", image: "https://images.unsplash.com/vector-1753382303802-7d317d852293?q=100&w=2500"},
+            { title: "Hex", url: "https://www.nddb.coop/ccnddb/games/Hexagon Twist/", image: "https://images.unsplash.com/vector-1761047846560-52720ea86a46?q=100&w=2500" },
+            { title: "Dino Run", url: "https://ormsescaperoad.w3spaces.com/dino.html", image: "https://images.unsplash.com/vector-1761941086671-a623243d84a3?q=100&w=2500" },
+            { title: "Flappy Bird", url: "https://ormsescaperoad.w3spaces.com/bird.html", image: "https://images.unsplash.com/photo-1732198246906-8168ef1ff6bc?q=100&w=2500" },
+            { title: "Drive Mad", url: "https://ormsescaperoad.w3spaces.com/drive-mad.html", image: "https://images.unsplash.com/photo-1763897236977-1baa4a026a6d?q=100&w=2500" },
+            { title: "Bank Heist", url: "https://ormsescaperoad.w3spaces.com/bank.html", image: "https://images.unsplash.com/photo-1738691035045-3fb009e8aa26?fit=clip&q=100&w=2500" },
+            { title: "Slither.io", url: "https://ormsescaperoad.w3spaces.com/snakeio.html", image: "https://images.unsplash.com/photo-1736613403120-8d48aebd29e1?fit=clip&q=100&w=2500" },
+            { title: "Escape Road", url: "https://ormsescaperoad.w3spaces.com/escape.html", image: "https://images.unsplash.com/photo-1764957080454-dd997a855733?q=100&w=2500" },
         ];
 
         const Spoofs = [
@@ -1267,6 +1328,65 @@ const musicPlayerHTML = `<!DOCTYPE html>
         ];
 
         /* --- LOGIC --- */
+        const ImageCache = {
+            db: null,
+            init: () => {
+                return new Promise((resolve) => {
+                    const request = indexedDB.open('NexusCache', 1);
+                    request.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('images')) {
+                            db.createObjectStore('images');
+                        }
+                    };
+                    request.onsuccess = (e) => {
+                        ImageCache.db = e.target.result;
+                        resolve();
+                    };
+                    request.onerror = () => resolve();
+                });
+            },
+            get: async (url) => {
+                if (!ImageCache.db) await ImageCache.init();
+                return new Promise((resolve) => {
+                    const tx = ImageCache.db.transaction('images', 'readonly');
+                    const store = tx.objectStore('images');
+                    const request = store.get(url);
+                    request.onsuccess = () => {
+                        if (request.result) {
+                            resolve(URL.createObjectURL(request.result));
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    request.onerror = () => resolve(null);
+                });
+            },
+            set: async (url, blob) => {
+                if (!ImageCache.db) await ImageCache.init();
+                const tx = ImageCache.db.transaction('images', 'readwrite');
+                const store = tx.objectStore('images');
+                store.put(blob, url);
+            },
+            fetchAndCache: async (url) => {
+                // If it's a base64 or already a blob URL, don't cache
+                if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+
+                const cached = await ImageCache.get(url);
+                if (cached) return cached;
+
+                try {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    await ImageCache.set(url, blob);
+                    return URL.createObjectURL(blob);
+                } catch (e) {
+                    console.error("Cache Error:", e);
+                    return url;
+                }
+            }
+        };
+
         const Utils = {
             toggleFull: () => !document.fullscreenElement ? document.documentElement.requestFullscreen() : document.exitFullscreen(),
             openBlank: () => {
@@ -1437,12 +1557,13 @@ const Notifications = {
 
         const Games = {
             list: [],
-            render: () => {
+            render: async () => {
                 const track = document.getElementById('card-track');
                 track.innerHTML = "";
                 Games.list = [...DefaultGames, ...State.settings.customGames];
                 
-                Games.list.forEach((g, i) => {
+                for (let i = 0; i < Games.list.length; i++) {
+                    const g = Games.list[i];
                     let card = document.createElement('div');
                     card.className = "game-card";
                     const isCustom = i >= DefaultGames.length;
@@ -1451,14 +1572,22 @@ const Notifications = {
                     if(g.isNew) html += `<div class="new-badge">New</div>`;
                     if(isCustom) html += `<div class="card-del-btn" onclick="event.stopPropagation(); Games.removeCustom(${i - DefaultGames.length})"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`;
 
-                    html += `<div class="card-inner"><img src="${g.image}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
+                    // Try to get cached image
+                    const displayImage = await ImageCache.fetchAndCache(g.image);
+                    html += `<div class="card-inner"><img src="${displayImage}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
                     
                     card.innerHTML = html;
                     card.onclick = () => window.open(g.url, '_blank');
                     card.onmouseenter = () => Games.hero(i);
                     Games.addTilt(card);
                     track.appendChild(card);
-                });
+
+                    // Staggered Animation
+                    Motion.animate(card, { opacity: [0, 1], y: [40, 0], scale: [0.8, 1] }, {
+                        delay: i * 0.05,
+                        type: "spring", stiffness: 200, damping: 20
+                    });
+                }
 
                 let addTile = document.createElement('div');
                 addTile.className = "game-card add-tile";
@@ -1466,6 +1595,11 @@ const Notifications = {
                 addTile.onclick = () => Modals.open('add-game-modal');
                 Games.addTilt(addTile);
                 track.appendChild(addTile);
+
+                Motion.animate(addTile, { opacity: [0, 1], y: [40, 0], scale: [0.8, 1] }, {
+                    delay: Games.list.length * 0.05,
+                    type: "spring", stiffness: 200, damping: 20
+                });
 
                 Games.hero(0);
             },
@@ -1488,24 +1622,59 @@ const Notifications = {
                 }
             },
             addTilt: (card) => {
+                const inner = card.querySelector('.card-inner');
+
+                // Add glare element if it doesn't exist
+                if (!inner.querySelector('.glare')) {
+                    const glare = document.createElement('div');
+                    glare.className = 'glare';
+                    glare.style.cssText = `
+                        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                        pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 80%);
+                        opacity: 0; transition: opacity 0.4s var(--smooth); z-index: 10;
+                    `;
+                    inner.appendChild(glare);
+                }
+                const glare = inner.querySelector('.glare');
+
                 card.addEventListener('mousemove', (e) => {
+                    const cfg = State.settings.tilt;
+                    if (!cfg.enabled || cfg.intensity === 0) return;
+
                     const rect = card.getBoundingClientRect();
-                    const tiltFactor = State.settings.tilt / 1000;
-                    const maxRot = 25;
+                    const tiltFactor = cfg.intensity / 500; // Normalized around 500
+                    const maxRot = 20 * tiltFactor;
+                    const perspective = cfg.perspective;
+                    const scale = cfg.scale;
 
-                    const x = (e.clientX - rect.left - rect.width/2) / (rect.width/2);
-                    const y = -(e.clientY - rect.top - rect.height/2) / (rect.height/2);
+                    const x = (e.clientX - rect.left) / rect.width; // 0 to 1
+                    const y = (e.clientY - rect.top) / rect.height; // 0 to 1
                     
-                    const rotX = y * maxRot * tiltFactor;
-                    const rotY = x * maxRot * tiltFactor;
+                    const rotX = (0.5 - y) * maxRot;
+                    const rotY = (x - 0.5) * maxRot;
 
-                    card.querySelector('.card-inner').style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+                    inner.style.transition = 'transform 0.1s ease-out';
+                    inner.style.transform = `perspective(${perspective}px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(${scale}, ${scale}, ${scale})`;
+
+                    glare.style.opacity = cfg.glare;
+                    glare.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,${cfg.glare * 1.5}) 0%, transparent 80%)`;
                 });
+
                 card.addEventListener('mouseleave', () => {
-                    card.querySelector('.card-inner').style.transform = `rotateX(0) rotateY(0)`;
+                    inner.style.transition = 'transform 0.5s var(--fluid)';
+                    inner.style.transform = `perspective(${State.settings.tilt.perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    glare.style.opacity = '0';
                 });
             },
-            scroll: (d) => document.getElementById('card-track').scrollBy({ left: d * 320, behavior: 'smooth' })
+            scroll: (d) => {
+                const track = document.getElementById('card-track');
+                const start = track.scrollLeft;
+                const end = start + (d * 320);
+
+                Motion.animate((progress) => {
+                    track.scrollLeft = start + (end - start) * progress;
+                }, { duration: 0.6, easing: [0.25, 1, 0.5, 1] });
+            }
         };
 
         const Settings = {
@@ -1514,8 +1683,6 @@ const Notifications = {
                 document.getElementById('time-toggle').checked = State.settings.time24;
                 document.getElementById('ptc-toggle').checked = State.settings.preventClose;
                 document.getElementById('bg-input').value = State.settings.bg;
-                document.getElementById('tilt-val').innerText = State.settings.tilt;
-                document.querySelector('.range-slider').value = State.settings.tilt;
 
                 if(State.settings.lightMode) document.body.classList.add('light-mode');
                 Settings.setBg(State.settings.bg);
@@ -1523,6 +1690,7 @@ const Notifications = {
             },
             toggleTheme: () => {
                 State.settings.lightMode = !State.settings.lightMode;
+                Motion.animate(document.body, { opacity: [0.8, 1] }, { duration: 0.3 });
                 document.body.classList.toggle('light-mode', State.settings.lightMode);
                 Settings.save('nx_light', State.settings.lightMode);
             },
@@ -1546,11 +1714,6 @@ const Notifications = {
                     wrap.style.backgroundImage = 'none';
                     document.getElementById('bg-default').style.opacity = 1;
                 }
-            },
-            setTilt: (val) => {
-                State.settings.tilt = parseInt(val);
-                document.getElementById('tilt-val').innerText = val;
-                Settings.save('nx_tilt', val);
             },
             setCloak: (id) => {
                 State.settings.cloak = id;
@@ -1818,6 +1981,80 @@ const Notifications = {
             }
         };
 
+        const TiltSettings = {
+            presets: {
+                off: { intensity: 0, glare: 0, perspective: 1000, scale: 1, enabled: false },
+                subtle: { intensity: 200, glare: 0.1, perspective: 1500, scale: 1.02, enabled: true },
+                balanced: { intensity: 350, glare: 0.15, perspective: 1200, scale: 1.03, enabled: true },
+                normal: { intensity: 500, glare: 0.2, perspective: 1000, scale: 1.05, enabled: true },
+                extreme: { intensity: 1000, glare: 0.4, perspective: 800, scale: 1.1, enabled: true },
+                insane: { intensity: 2000, glare: 0.6, perspective: 600, scale: 1.2, enabled: true }
+            },
+            open: () => {
+                const cfg = State.settings.tilt;
+                document.getElementById('tilt-s-intensity').value = cfg.intensity;
+                document.getElementById('tilt-s-glare').value = cfg.glare;
+                document.getElementById('tilt-s-persp').value = cfg.perspective;
+                document.getElementById('tilt-s-scale').value = cfg.scale;
+
+                TiltSettings.updateLabels();
+                TiltSettings.renderPreview();
+                Modals.open('tilt-modal');
+            },
+            updateLabels: () => {
+                const cfg = State.settings.tilt;
+                document.getElementById('tilt-v-intensity').innerText = cfg.intensity;
+                document.getElementById('tilt-v-glare').innerText = cfg.glare;
+                document.getElementById('tilt-v-persp').innerText = cfg.perspective;
+                document.getElementById('tilt-v-scale').innerText = cfg.scale;
+            },
+            update: () => {
+                State.settings.tilt = {
+                    intensity: parseInt(document.getElementById('tilt-s-intensity').value),
+                    glare: parseFloat(document.getElementById('tilt-s-glare').value),
+                    perspective: parseInt(document.getElementById('tilt-s-persp').value),
+                    scale: parseFloat(document.getElementById('tilt-s-scale').value),
+                    enabled: parseInt(document.getElementById('tilt-s-intensity').value) > 0
+                };
+
+                const cfg = State.settings.tilt;
+                Settings.save('nx_tilt_intensity', cfg.intensity);
+                Settings.save('nx_tilt_glare', cfg.glare);
+                Settings.save('nx_tilt_persp', cfg.perspective);
+                Settings.save('nx_tilt_scale', cfg.scale);
+                Settings.save('nx_tilt_enabled', cfg.enabled);
+
+                TiltSettings.updateLabels();
+            },
+            applyPreset: (p) => {
+                const preset = TiltSettings.presets[p];
+                State.settings.tilt = { ...preset };
+
+                document.getElementById('tilt-s-intensity').value = preset.intensity;
+                document.getElementById('tilt-s-glare').value = preset.glare;
+                document.getElementById('tilt-s-persp').value = preset.perspective;
+                document.getElementById('tilt-s-scale').value = preset.scale;
+
+                TiltSettings.update();
+            },
+            renderPreview: async () => {
+                const container = document.getElementById('tilt-preview-container');
+                container.innerHTML = '';
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.style.minWidth = '200px';
+                card.style.height = '280px';
+                const highResImg = "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=100&w=2500";
+                const displayImage = await ImageCache.fetchAndCache(highResImg);
+                card.innerHTML = `<div class="card-inner"><img src="${displayImage}"></div><div class="card-title">EXAMPLE</div>`;
+                Games.addTilt(card);
+                container.appendChild(card);
+
+                // Trigger reveal
+                Motion.animate(card, { opacity: [0, 1], scale: [0.8, 1] }, { type: "spring", stiffness: 300, damping: 20 });
+            }
+        };
+
         const About = {
             init: () => {
                 document.getElementById('about-version').innerText = CONFIG.version;
@@ -1838,13 +2075,45 @@ const Notifications = {
             set: (v, instant = false) => {
                 const items = document.querySelectorAll('.nav-item');
                 const views = document.querySelectorAll('.content-view');
-                items.forEach(n => n.classList.remove('active'));
-                views.forEach(c => c.classList.remove('active-view'));
                 
                 const idx = v === 'games' ? 0 : 1;
                 const activeItem = items[idx];
+                const viewEl = document.getElementById(v+'-view');
+
+                if (viewEl.classList.contains('active-view')) return;
+
+                // Handle Outgoing
+                const currentView = document.querySelector('.content-view.active-view');
+                if (currentView && !instant) {
+                    Motion.animate(currentView, {
+                        opacity: 0,
+                        scale: 0.96,
+                        y: -20
+                    }, {
+                        duration: 0.4,
+                        easing: [0.4, 0, 0.2, 1]
+                    }).finished.then(() => {
+                        currentView.classList.remove('active-view');
+                    });
+                } else if (currentView) {
+                    currentView.classList.remove('active-view');
+                }
+
+                items.forEach(n => n.classList.remove('active'));
                 activeItem.classList.add('active');
-                document.getElementById(v+'-view').classList.add('active-view');
+
+                viewEl.classList.add('active-view');
+
+                if (!instant) {
+                    Motion.animate(viewEl, {
+                        opacity: [0, 1],
+                        scale: [0.96, 1],
+                        y: [20, 0]
+                    }, {
+                        duration: 0.5,
+                        easing: [0.25, 1, 0.5, 1]
+                    });
+                }
 
                 // Move Indicator
                 const indicator = document.getElementById('nav-indicator');
@@ -1931,6 +2200,16 @@ const Notifications = {
 
             // Init Lucide
             lucide.createIcons();
+
+            // Tray Hover Effects with Motion
+            document.querySelectorAll('.tray-item').forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    Motion.animate(item, { scale: 1.15, y: -2 }, { type: "spring", stiffness: 400, damping: 15 });
+                });
+                item.addEventListener('mouseleave', () => {
+                    Motion.animate(item, { scale: 1, y: 0 }, { type: "spring", stiffness: 400, damping: 15 });
+                });
+            });
         };
         
         window.addEventListener('beforeunload', (e) => {
