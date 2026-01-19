@@ -21,6 +21,9 @@
             --glass-bg: rgba(18, 18, 18, 0.65);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-blur: blur(16px);
+            --blur-heavy: blur(20px);
+            --blur-mid: blur(12px);
+            --blur-light: blur(4px);
             --text-main: #ffffff;
             --text-dim: #94a3b8;
             --accent: #3b82f6;
@@ -69,14 +72,14 @@
         @keyframes orbPulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } }
 
         /* --- INTERFACE --- */
-        #main-interface { opacity: 0; pointer-events: none; transition: opacity 0.8s var(--smooth); width: 100%; height: 100%; display: flex; flex-direction: column; }
+        #main-interface { opacity: 0; pointer-events: none; width: 100%; height: 100%; display: flex; flex-direction: column; will-change: opacity; transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
         #main-interface.unlocked { opacity: 1; pointer-events: auto; }
 
         /* --- PILL UI OOBE --- */
         #oobe-overlay {
             position: fixed; inset: 0; background: var(--bg-base); z-index: 10000; display: none;
             align-items: center; justify-content: center; transition: opacity 0.5s var(--smooth);
-            backdrop-filter: blur(20px);
+            backdrop-filter: var(--blur-heavy);
         }
         
         .pill-container {
@@ -128,7 +131,7 @@
 
         /* --- MODALS --- */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: var(--blur-mid);
             z-index: 11000; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none;
         }
@@ -137,6 +140,7 @@
             background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 32px;
             padding: 30px; width: 500px; max-width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex; flex-direction: column; max-height: 85vh;
+            will-change: transform, opacity; backface-visibility: hidden;
         }
         .modal-box.wide { width: 800px; max-width: 95%; }
         .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
@@ -147,7 +151,7 @@
         .spoof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; overflow-y: auto; padding: 5px; width: 100%; }
         .spoof-item {
             background: rgba(125,125,125,0.1); border-radius: 16px; padding: 12px; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s var(--fluid); border: 1px solid transparent;
+            display: flex; flex-direction: column; align-items: center; gap: 8px; transition: background-color 0.3s, border-color 0.3s; border: 1px solid transparent;
         }
         .spoof-item:hover { background: rgba(125,125,125,0.2); }
         .spoof-item.selected { border-color: var(--accent); background: var(--accent-glow); }
@@ -170,7 +174,7 @@
         }
         .nav-item {
             padding: 8px 24px; border-radius: 100px; cursor: pointer; font-weight: 500; font-size: 0.9rem;
-            color: var(--text-dim); transition: color 0.3s;
+            color: var(--text-dim); transition: color 0.3s, background-color 0.3s;
             position: relative; z-index: 1;
             display: flex; align-items: center; justify-content: center;
             line-height: 1;
@@ -183,7 +187,7 @@
         .tray-item {
             background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: var(--glass-blur);
             color: var(--text-main); height: 44px; display: flex; align-items: center; justify-content: center;
-            border-radius: 22px; transition: 0.4s var(--fluid); cursor: pointer;
+            border-radius: 22px; transition: background-color 0.4s, color 0.4s, border-color 0.4s; cursor: pointer;
         }
         .clock { padding: 0 20px; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 80px; }
 
@@ -191,7 +195,7 @@
         #notification-center {
             position: absolute; top: 60px; right: 0; width: 380px; max-height: 500px;
             background: var(--card-bg); border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px); 
+            backdrop-filter: var(--blur-mid);
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); border-radius: 24px;
             transform-origin: top right;
             opacity: 0; pointer-events: none; z-index: 2000;
@@ -243,7 +247,7 @@
             border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.6); border-radius: 28px;
             transform-origin: top right; opacity: 0; pointer-events: none; z-index: 2000;
             display: flex; flex-direction: column; overflow: hidden;
-            backdrop-filter: blur(20px);
+            backdrop-filter: var(--blur-heavy);
         }
         #todo-widget.active { pointer-events: auto; }
         
@@ -271,8 +275,9 @@
         .todo-item { 
             display: flex; align-items: center; padding: 14px; background: rgba(125,125,125,0.04);
             border-radius: 18px; border: 1px solid var(--glass-border);
+            transition: background-color 0.2s;
         }
-        .todo-item:hover { background: rgba(125,125,125,0.08); transform: translateX(5px); }
+        .todo-item:hover { background: rgba(125,125,125,0.08); }
         .todo-item.completed { opacity: 0.5; }
         .todo-item.completed .todo-text { text-decoration: line-through; color: var(--text-dim); }
         
@@ -299,7 +304,7 @@
         .view-container { flex: 1; position: relative; width: 100%; display: flex; overflow: hidden; }
         .content-view {
             position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: scale(0.96) translateY(20px);
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; will-change: transform, opacity, filter;
         }
         .content-view.active-view { opacity: 1; visibility: visible; transform: scale(1) translateY(0); z-index: 10; }
 
@@ -332,7 +337,7 @@
         .card-overlay {
             position: absolute; inset: 0; background: rgba(0,0,0,0.4);
             display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: 0.4s var(--fluid); backdrop-filter: blur(4px); z-index: 5;
+            opacity: 0; transition: 0.4s var(--fluid); backdrop-filter: var(--blur-light); z-index: 5;
         }
         .game-card:hover .card-overlay { opacity: 1; }
         .play-icon { color: white; transform: scale(0.5); transition: 0.4s var(--fluid); opacity: 0; }
@@ -421,7 +426,7 @@
 
         .btn {
             padding: 10px 20px; border-radius: 12px; font-weight: 600; text-decoration: none;
-            transition: all 0.3s var(--fluid); display: inline-flex; align-items: center; justify-content: center;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s; display: inline-flex; align-items: center; justify-content: center;
             font-size: 0.9rem; cursor: pointer; border: none;
         }
         .btn-primary { background: var(--accent); color: white; }
@@ -441,7 +446,7 @@
         .scroll-arrow {
             position: absolute; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.1); color: white; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 100; transition: 0.4s var(--fluid); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer; z-index: 100; transition: background-color 0.4s, color 0.4s; backdrop-filter: var(--blur-mid); border: 1px solid rgba(255,255,255,0.1);
         }
         .scroll-arrow:hover { background: var(--text-main); color: var(--bg-base); }
         .scroll-arrow.left { left: 30px; } .scroll-arrow.right { right: 30px; }
@@ -453,6 +458,7 @@
             background: #000; border-radius: 30px; overflow: hidden;
             box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px var(--accent-glow);
             z-index: 9999; display: flex; flex-direction: column; resize: both; min-width: 600px; min-height: 400px;
+            will-change: transform, opacity, left, top; backface-visibility: hidden;
         }
         #music-window.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
         
@@ -954,6 +960,7 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 };
 
                 this.generateSquiggle(); 
+                this.artAnim = null;
             }
 
             async init() {
@@ -995,9 +1002,11 @@ const musicPlayerHTML = `<!DOCTYPE html>
                         await this.initAudioContext();
                         this.media.play().catch(e => console.error("Playback failed:", e));
                         this.ui.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        this.pulseArt(true);
                     } else { 
                         this.media.pause();
                         this.ui.playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        this.pulseArt(false);
                     }
                 };
 
@@ -1089,13 +1098,23 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 return URL.createObjectURL(blob);
             }
 
+            pulseArt(active) {
+                if (this.artAnim) { this.artAnim.stop(); this.artAnim = null; }
+                const target = this.playlist[this.index]?.isVideo ? this.ui.video : this.ui.cover;
+                if (active && !this.playlist[this.index]?.isVideo) {
+                    this.artAnim = Motion.animate(target, { scale: [1, 1.04, 1] }, { duration: 4, repeat: Infinity, ease: "easeInOut" });
+                } else {
+                    Motion.animate(target, { scale: 1 }, { duration: 0.5 });
+                }
+            }
+
             loadTrack(i) {
                 if(i < 0 || i >= this.playlist.length) return;
                 this.index = i;
                 const track = this.playlist[i];
                 
                 this.media.src = track.url;
-                this.media.load(); // Ensure fresh load
+                this.media.load();
                 this.ui.title.innerText = track.title;
                 this.ui.artist.innerText = track.artist;
                 this.ui.cover.src = track.cover;
@@ -1103,21 +1122,22 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 if (track.isVideo) {
                     this.ui.video.style.display = 'block';
                     this.ui.cover.style.display = 'none';
-                    Motion.animate(this.ui.video, { opacity: [0, 1], scale: [0.95, 1] }, { duration: 0.4 });
+                    Motion.animate(this.ui.video, { opacity: [0, 1], scale: [0.95, 1], filter: ['blur(10px)', 'blur(0px)'] }, { duration: 0.6 });
                 } else {
                     this.ui.video.style.display = 'none';
                     this.ui.cover.style.display = 'block';
-                    Motion.animate(this.ui.cover, { opacity: [0, 1], scale: [0.9, 1], filter: ['blur(10px)', 'blur(0px)'] }, { duration: 0.5 });
+                    Motion.animate(this.ui.cover, { opacity: [0, 1], scale: [0.9, 1], filter: ['blur(15px)', 'blur(0px)'] }, { duration: 0.7, type: "spring", stiffness: 300, damping: 25 });
                 }
 
-                Motion.animate(this.ui.title, { y: [10, 0], opacity: [0, 1] }, { duration: 0.4 });
-                Motion.animate(this.ui.artist, { y: [10, 0], opacity: [0, 1] }, { duration: 0.4, delay: 0.1 });
+                Motion.animate(this.ui.title, { y: [15, 0], opacity: [0, 1], filter: ['blur(5px)', 'blur(0px)'] }, { duration: 0.5 });
+                Motion.animate(this.ui.artist, { y: [15, 0], opacity: [0, 1], filter: ['blur(5px)', 'blur(0px)'] }, { duration: 0.5, delay: 0.1 });
 
                 this.updateActiveItem();
                 
                 if(this.audioCtx) {
                     this.media.play().catch(e => console.error("Playback failed:", e));
                     this.ui.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    this.pulseArt(true);
                 }
             }
 
@@ -1130,7 +1150,11 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 
                 if(isNaN(dur)) return;
 
-                this.ui.curr.innerText = this.formatTime(cur);
+                const curFormatted = this.formatTime(cur);
+                if (this.ui.curr.innerText !== curFormatted) {
+                    this.ui.curr.innerText = curFormatted;
+                    Motion.animate(this.ui.curr, { opacity: [0.5, 1], y: [2, 0] }, { duration: 0.2 });
+                }
                 this.ui.dur.innerText = this.formatTime(dur);
                 
                 const pct = (cur / dur);
@@ -1213,6 +1237,7 @@ const musicPlayerHTML = `<!DOCTYPE html>
         const CONFIG = {
             version: "14.0",
             patchLevel: "January 22 2026",
+            isChromebook: /CrOS/.test(navigator.userAgent),
             libs: {
                 marked: "17.0.1",
                 lucide: "0.562.0",
@@ -1401,13 +1426,16 @@ const musicPlayerHTML = `<!DOCTYPE html>
                     win.classList.add('active');
                     MusicApp.init();
 
-                    // Determine if it was moved
-                    const isMoved = win.style.transform === 'none';
-                    const targetScale = [0.9, 1];
+                    // Determine if it was moved (if it has left/top set manually)
+                    const isMoved = win.dataset.moved === 'true';
                     const targetOpacity = [0, 1];
 
                     if (isMoved) {
-                        Motion.animate(win, { opacity: targetOpacity, scale: targetScale, filter: ['blur(10px)', 'blur(0px)'] }, {
+                        Motion.animate(win, {
+                            opacity: targetOpacity,
+                            scale: [0.9, 1],
+                            filter: ['blur(10px)', 'blur(0px)']
+                        }, {
                             type: "spring", stiffness: 450, damping: 30,
                             filter: { ease: "circOut", duration: 0.4 }
                         });
@@ -1423,7 +1451,7 @@ const musicPlayerHTML = `<!DOCTYPE html>
                         });
                     }
                 } else {
-                    const isMoved = win.style.transform === 'none';
+                    const isMoved = win.dataset.moved === 'true';
                     const anim = isMoved
                         ? Motion.animate(win, { opacity: 0, scale: 0.85, filter: 'blur(10px)' }, { duration: 0.4, ease: [0.4, 0, 0.2, 1] })
                         : Motion.animate(win, { opacity: 0, transform: 'translate(-50%, -50%) scale(0.85)', filter: 'blur(10px)' }, { duration: 0.4, ease: [0.4, 0, 0.2, 1] });
@@ -1440,10 +1468,10 @@ const musicPlayerHTML = `<!DOCTYPE html>
                 header.addEventListener('mousedown', (e) => {
                     isDragging = true;
                     win.classList.add('dragging');
+                    win.dataset.moved = 'true';
                     startX = e.clientX;
                     startY = e.clientY;
                     const rect = win.getBoundingClientRect();
-                    // Store offset relative to viewport
                     initialLeft = rect.left;
                     initialTop = rect.top;
                     
@@ -1451,19 +1479,30 @@ const musicPlayerHTML = `<!DOCTYPE html>
                     win.style.transform = 'none'; 
                     win.style.left = initialLeft + 'px';
                     win.style.top = initialTop + 'px';
+                    win.style.margin = '0';
                 });
 
                 document.addEventListener('mousemove', (e) => {
                     if (!isDragging) return;
                     const dx = e.clientX - startX;
                     const dy = e.clientY - startY;
-                    win.style.left = `${initialLeft + dx}px`;
-                    win.style.top = `${initialTop + dy}px`;
+
+                    Motion.animate(win, {
+                        left: initialLeft + dx,
+                        top: initialTop + dy
+                    }, {
+                        type: "spring",
+                        stiffness: 1200,
+                        damping: 60,
+                        mass: 0.5
+                    });
                 });
 
                 document.addEventListener('mouseup', () => {
+                    if (!isDragging) return;
                     isDragging = false;
                     win.classList.remove('dragging');
+                    Motion.animate(win, { scale: 1 }, { type: "spring", stiffness: 400, damping: 20 });
                 });
             }
         };
@@ -2271,6 +2310,18 @@ const Notifications = {
         window.onload = () => {
             document.title = `NexusOS ${CONFIG.version}`;
             document.querySelectorAll('.pill-header').forEach(el => { if (el.textContent.trim() === 'NexusOS') el.textContent = `NexusOS ${CONFIG.version}`; });
+
+                // Chromebook Optimizations
+                if (CONFIG.isChromebook) {
+                    document.documentElement.style.setProperty('--glass-blur', 'blur(8px)');
+                    document.documentElement.style.setProperty('--blur-heavy', 'blur(10px)');
+                    document.documentElement.style.setProperty('--blur-mid', 'blur(6px)');
+                    document.documentElement.style.setProperty('--blur-light', 'blur(2px)');
+                    const bgDefault = document.getElementById('bg-default');
+                    if (bgDefault) bgDefault.style.animationDuration = '240s'; // Slow down background spin
+                    const bgOrb = document.getElementById('bg-orb');
+                    if (bgOrb) bgOrb.style.animation = 'none'; // Disable expensive orb pulse
+                }
 
             // Populate Settings Spoof Grid
             const sg = document.getElementById('settings-spoof-grid');
