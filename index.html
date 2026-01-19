@@ -315,7 +315,7 @@
             width: 100%; height: 52vh; min-height: 320px; background: linear-gradient(to top, var(--bg-base), transparent);
             backdrop-filter: var(--glass-blur); display: flex; align-items: center; opacity: 0;
         }
-        .carousel-track { display: flex; gap: 30px; padding: 0 100px; overflow-x: auto; scroll-behavior: smooth; width: 100%; height: 100%; align-items: center; scrollbar-width: none; }
+        .carousel-track { display: flex; gap: 30px; padding: 0 100px; overflow-x: auto; scroll-behavior: auto; width: 100%; height: 100%; align-items: center; scrollbar-width: none; }
         .carousel-track::-webkit-scrollbar { display: none; }
 
         /* --- GAME CARD --- */
@@ -325,9 +325,17 @@
             background: var(--card-bg); box-shadow: 0 15px 35px rgba(0,0,0,0.3); transition: transform 0.1s linear; position: relative;
             backface-visibility: hidden; transform-style: preserve-3d;
         }
-        .card-inner img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--fluid), filter 0.5s; filter: brightness(0.8); }
-        .game-card:hover .card-inner { box-shadow: 0 0 30px var(--accent-glow); border-color: rgba(255,255,255,0.3); }
-        .game-card:hover img { transform: scale(1.1); filter: brightness(1); }
+        .card-inner img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--fluid), filter 0.6s; filter: brightness(0.7) saturate(1.2); }
+        .game-card:hover .card-inner { box-shadow: 0 0 40px var(--accent-glow); border-color: rgba(255,255,255,0.4); }
+        .game-card:hover img { transform: scale(1.15); filter: brightness(1) saturate(1.4); }
+        .card-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: 0.4s var(--fluid); backdrop-filter: blur(4px); z-index: 5;
+        }
+        .game-card:hover .card-overlay { opacity: 1; }
+        .play-icon { color: white; transform: scale(0.5); transition: 0.4s var(--fluid); opacity: 0; }
+        .game-card:hover .play-icon { transform: scale(1); opacity: 1; }
         .card-title {
             position: absolute; bottom: 20px; left: 20px; font-weight: 700; font-size: 1.2rem; color: white;
             text-shadow: 0 2px 10px rgba(0,0,0,0.9); opacity: 0; transform: translateY(10px); transition: 0.3s; pointer-events: none;
@@ -430,9 +438,9 @@
         .beta-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
         .scroll-arrow {
-            position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border-radius: 50%;
-            background: rgba(125,125,125,0.1); display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 100; transition: 0.3s; backdrop-filter: blur(10px);
+            position: absolute; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1); color: white; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 100; transition: 0.4s var(--fluid); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1);
         }
         .scroll-arrow:hover { background: var(--text-main); color: var(--bg-base); }
         .scroll-arrow.left { left: 30px; } .scroll-arrow.right { right: 30px; }
@@ -799,7 +807,9 @@ const musicPlayerHTML = `<!DOCTYPE html>
     <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js" integrity="sha384-90id7S86mXvYfS998f48G5Y46/X/uU7vO+AUnS4v0BfNcs9Xo7oG/YtJ5Ew/u7u" crossorigin="anonymous"><\/script>
     <script src="https://cdn.jsdelivr.net/npm/motion@12.27.0/dist/motion.js"><\/script>
     <script>
-        window.Buffer = window.Buffer || buffer.Buffer;
+        try {
+            window.Buffer = window.Buffer || (typeof buffer !== 'undefined' ? buffer.Buffer : null);
+        } catch(e) { console.error("Buffer polyfill error", e); }
     <\/script>
     <style>
         :root {
@@ -1475,7 +1485,8 @@ const musicPlayerHTML = `<!DOCTYPE html>
 
                     if (isMoved) {
                         Motion.animate(win, { opacity: targetOpacity, scale: targetScale, filter: ['blur(10px)', 'blur(0px)'] }, {
-                            type: "spring", stiffness: 450, damping: 30
+                            type: "spring", stiffness: 450, damping: 30,
+                            filter: { ease: "circOut", duration: 0.4 }
                         });
                     } else {
                         // Original centered position
@@ -1484,7 +1495,8 @@ const musicPlayerHTML = `<!DOCTYPE html>
                             transform: ['translate(-50%, -50%) scale(0.8)', 'translate(-50%, -50%) scale(1)'],
                             filter: ['blur(10px)', 'blur(0px)']
                         }, {
-                            type: "spring", stiffness: 450, damping: 30
+                            type: "spring", stiffness: 450, damping: 30,
+                            filter: { ease: "circOut", duration: 0.4 }
                         });
                     }
                 } else {
@@ -1544,7 +1556,8 @@ const Notifications = {
                     if (todo.classList.contains('active')) Todo.toggle();
                     el.classList.add('active');
                     Motion.animate(el, { opacity: [0, 1], scale: [0.9, 1], y: [-20, 0], filter: ['blur(10px)', 'blur(0px)'] }, {
-                        type: "spring", stiffness: 500, damping: 35
+                        type: "spring", stiffness: 500, damping: 35,
+                        filter: { ease: "circOut", duration: 0.4 }
                     });
                     if(!Notifications.loaded) Notifications.reload();
                 } else {
@@ -1607,13 +1620,12 @@ const Notifications = {
 
         const Games = {
             list: [],
-            render: async () => {
+            render: () => {
                 const track = document.getElementById('card-track');
                 track.innerHTML = "";
                 Games.list = [...DefaultGames, ...State.settings.customGames];
                 
-                for (let i = 0; i < Games.list.length; i++) {
-                    const g = Games.list[i];
+                Games.list.forEach((g, i) => {
                     let card = document.createElement('div');
                     card.className = "game-card";
                     const isCustom = i >= DefaultGames.length;
@@ -1622,16 +1634,24 @@ const Notifications = {
                     if(g.isNew) html += `<div class="new-badge">New</div>`;
                     if(isCustom) html += `<div class="card-del-btn" onclick="event.stopPropagation(); Games.removeCustom(${i - DefaultGames.length})"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`;
 
-                    // Try to get cached image
-                    const displayImage = await ImageCache.fetchAndCache(g.image);
-                    html += `<div class="card-inner"><img src="${displayImage}" loading="lazy"></div><div class="card-title">${g.title}</div>`;
+                    html += `<div class="card-inner" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+                                <img src="" loading="lazy" style="opacity: 0; transition: opacity 0.5s;" onload="this.style.opacity='1'" onerror="this.style.opacity='0'">
+                                <div class="card-overlay"><div class="play-icon"><i data-lucide="play-circle" style="width:48px; height:48px;"></i></div></div>
+                             </div>
+                             <div class="card-title">${g.title}</div>`;
                     
                     card.innerHTML = html;
                     card.onclick = () => window.open(g.url, '_blank');
                     card.onmouseenter = () => Games.hero(i);
                     Games.addTilt(card);
                     track.appendChild(card);
-                }
+
+                    // Non-blocking image load
+                    ImageCache.fetchAndCache(g.image).then(displayImage => {
+                        const img = card.querySelector('img');
+                        if (img) img.src = displayImage;
+                    });
+                });
 
                 let addTile = document.createElement('div');
                 addTile.className = "game-card add-tile";
@@ -1648,6 +1668,7 @@ const Notifications = {
                     filter: ['blur(10px)', 'blur(0px)']
                 }, {
                     delay: Motion.stagger(0.04),
+                    filter: { ease: "circOut", duration: 0.5 },
                     type: "spring", stiffness: 300, damping: 25
                 }).then(() => {
                     Utils.initInteractions();
@@ -1682,7 +1703,10 @@ const Notifications = {
 
                 Motion.animate(txt, { opacity: 0, y: 10, filter: 'blur(5px)' }, { duration: 0.2 }).then(() => {
                     txt.textContent = Games.list[i].title;
-                    Motion.animate(txt, { opacity: 1, y: 0, filter: 'blur(0px)' }, { type: "spring", stiffness: 300, damping: 20 });
+                    Motion.animate(txt, { opacity: 1, y: 0, filter: 'blur(0px)' }, {
+                        type: "spring", stiffness: 300, damping: 20,
+                        filter: { ease: "circOut", duration: 0.4 }
+                    });
                 });
 
                 Motion.animate(actions, { scale: 0.9, opacity: 0.5 }, { duration: 0.15 }).then(() => {
@@ -1745,11 +1769,23 @@ const Notifications = {
             scroll: (d) => {
                 const track = document.getElementById('card-track');
                 const start = track.scrollLeft;
-                const end = start + (d * 320);
+                const end = start + (d * 400);
 
-                Motion.animate((progress) => {
-                    track.scrollLeft = start + (end - start) * progress;
-                }, { duration: 0.6, ease: [0.25, 1, 0.5, 1] });
+                Motion.animate(start, end, {
+                    duration: 0.6,
+                    ease: [0.25, 1, 0.5, 1],
+                    onUpdate: (v) => track.scrollLeft = v
+                });
+            },
+            initWheel: () => {
+                const track = document.getElementById('card-track');
+                if (!track) return;
+                track.addEventListener('wheel', (e) => {
+                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                        e.preventDefault();
+                        track.scrollLeft += e.deltaY;
+                    }
+                }, { passive: false });
             }
         };
 
@@ -1858,7 +1894,8 @@ const Notifications = {
                     if (notif.classList.contains('active')) Notifications.toggle();
                     el.classList.add('active');
                     Motion.animate(el, { opacity: [0, 1], scale: [0.9, 1], y: [-20, 0], filter: ['blur(10px)', 'blur(0px)'] }, {
-                        type: "spring", stiffness: 500, damping: 35
+                        type: "spring", stiffness: 500, damping: 35,
+                        filter: { ease: "circOut", duration: 0.4 }
                     });
 
                     // Interior Stagger
@@ -2036,7 +2073,8 @@ const Notifications = {
                     Motion.animate(box, { scale: [0.8, 1], y: [40, 0], opacity: [0, 1], filter: ['blur(15px)', 'blur(0px)'] }, {
                         type: "spring",
                         stiffness: 450,
-                        damping: 32
+                        damping: 32,
+                        filter: { ease: "circOut", duration: 0.5 }
                     });
                 }
 
@@ -2190,7 +2228,7 @@ const Notifications = {
 
                 TiltSettings.update();
             },
-            renderPreview: async () => {
+            renderPreview: () => {
                 const container = document.getElementById('tilt-preview-container');
                 container.innerHTML = '';
                 const card = document.createElement('div');
@@ -2198,10 +2236,18 @@ const Notifications = {
                 card.style.minWidth = '200px';
                 card.style.height = '280px';
                 const highResImg = "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=100&w=2500";
-                const displayImage = await ImageCache.fetchAndCache(highResImg);
-                card.innerHTML = `<div class="card-inner"><img src="${displayImage}"></div><div class="card-title">EXAMPLE</div>`;
+
+                card.innerHTML = `<div class="card-inner" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+                                    <img src="" loading="lazy" style="opacity: 0; transition: opacity 0.5s;" onload="this.style.opacity='1'">
+                                  </div>
+                                  <div class="card-title">EXAMPLE</div>`;
                 Games.addTilt(card);
                 container.appendChild(card);
+
+                ImageCache.fetchAndCache(highResImg).then(displayImage => {
+                    const img = card.querySelector('img');
+                    if (img) img.src = displayImage;
+                });
 
                 // Trigger reveal
                 Motion.animate(card, { opacity: [0, 1], scale: [0.8, 1] }, { type: "spring", stiffness: 300, damping: 20 });
@@ -2265,7 +2311,8 @@ const Notifications = {
                         y: [30, 0],
                         filter: ['blur(10px)', 'blur(0px)']
                     }, {
-                        type: "spring", stiffness: 400, damping: 30
+                        type: "spring", stiffness: 400, damping: 30,
+                        filter: { ease: "circOut", duration: 0.5 }
                     });
                 }
 
@@ -2336,6 +2383,7 @@ const Notifications = {
 
             Settings.apply();
             Games.render();
+            Games.initWheel();
             Todo.render();
             Clock.update();
             setInterval(Clock.update, 1000);
