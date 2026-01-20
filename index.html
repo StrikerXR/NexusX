@@ -113,17 +113,12 @@
             display: inline-block;
             white-space: nowrap;
             overflow: hidden;
-            animation: typing 2s steps(7, end), blink-caret .75s step-end infinite;
-            border-right: 3px solid var(--accent);
             margin-bottom: 10px;
         }
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--accent); }
+        .tw-cursor {
+            display: inline-block; width: 3px; height: 1em;
+            background: var(--accent); margin-left: 5px; vertical-align: middle;
+            box-shadow: 0 0 10px var(--accent);
         }
 
 
@@ -1482,19 +1477,23 @@ const musicPlayerHTML = `<!DOCTYPE html>
                     win.style.margin = '0';
                 });
 
+                let rafId = null;
                 document.addEventListener('mousemove', (e) => {
                     if (!isDragging) return;
                     const dx = e.clientX - startX;
                     const dy = e.clientY - startY;
 
-                    Motion.animate(win, {
-                        left: initialLeft + dx,
-                        top: initialTop + dy
-                    }, {
-                        type: "spring",
-                        stiffness: 1200,
-                        damping: 60,
-                        mass: 0.5
+                    if (rafId) cancelAnimationFrame(rafId);
+                    rafId = requestAnimationFrame(() => {
+                        Motion.animate(win, {
+                            left: initialLeft + dx,
+                            top: initialTop + dy
+                        }, {
+                            type: "spring",
+                            stiffness: 1200,
+                            damping: 60,
+                            mass: 0.5
+                        });
                     });
                 });
 
@@ -2273,11 +2272,57 @@ const Notifications = {
             }
         };
 
+        const Typewriter = {
+            animate: async (el, texts) => {
+                let i = 0;
+                const textNode = document.createTextNode("");
+                el.innerHTML = "";
+                el.appendChild(textNode);
+                const cursor = document.createElement('span');
+                cursor.className = 'tw-cursor';
+                el.appendChild(cursor);
+
+                Motion.animate(cursor, { opacity: [0, 1, 0] }, { duration: 0.8, repeat: Infinity, ease: "steps(2)" });
+                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+                while (document.body.contains(el)) {
+                    const fullText = texts[i % texts.length];
+
+                    Motion.animate(cursor, {
+                        backgroundColor: colors[i % colors.length],
+                        height: ["24px", "32px", "24px"]
+                    }, { duration: 0.6 });
+
+                    await Motion.animate(0, 1, {
+                        duration: 1.5,
+                        onUpdate: (v) => {
+                            textNode.textContent = fullText.slice(0, Math.floor(v * fullText.length));
+                        }
+                    });
+                    await new Promise(r => setTimeout(r, 2000));
+
+                    if (!document.body.contains(el)) break;
+
+                    await Motion.animate(0, 1, {
+                        duration: 0.8,
+                        onUpdate: (v) => {
+                            textNode.textContent = fullText.slice(0, Math.floor((1 - v) * fullText.length));
+                        }
+                    });
+                    i++;
+                }
+            }
+        };
+
         const OOBE = {
             init: () => {
                 if(!localStorage.getItem(State.oobeKey)) {
                     const header = document.querySelector('#oobe-overlay .pill-header');
-                    header.innerHTML = '<span class="handwriting">NexusX</span>';
+                    const hand = document.createElement('span');
+                    hand.className = "handwriting";
+                    header.innerHTML = "";
+                    header.appendChild(hand);
+                    Typewriter.animate(hand, ["NexusX", "Next Gen", "Pixel Perfect", "Fluid OS"]);
 
                     document.getElementById('oobe-overlay').style.display = 'flex';
                     // Render Spoofs in OOBE pill
